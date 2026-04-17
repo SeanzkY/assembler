@@ -85,7 +85,27 @@ char** splitLine(char** lineStart){
     char* currStr;
     while(**lineStart && **lineStart != END_SENTENCE){
         if(firstTokenRes){
-
+            if(firstTokenRes->type == LABEL){
+                firstTokenRes = generateSymbol(getFirstWord);
+            }
+            else if(firstTokenRes->type == COMMAND){
+                while(**lineStart && **lineStart != END_SENTENCE){
+                    getNextWordParams(lineStart);
+                }
+            }
+            else if(firstTokenRes->type == DECLARATION){
+                if(strcmp(firstTokenRes->name, ".string") == 0){
+                    getNextWordStrLiteral(firstTokenRes->name);
+                }
+                else if(strcmp(firstTokenRes->name, ".data") == 0){
+                    while(**lineStart && **lineStart != END_SENTENCE){
+                        getNextWordParams(lineStart);
+                    }
+                }
+                else{
+                    printf("exception\n");
+                }
+            }
         }
         else{
             firstTokenRes = generateSymbol(getFirstWord);

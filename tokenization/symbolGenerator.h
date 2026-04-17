@@ -1,9 +1,15 @@
 typedef enum SymbolType {
     MACRO_START,
     MACRO_END,
-    MACRO_DECLARATION
+    MACRO_DECLARATION,
+    LABEL,
+    DECLARATION,
+    COMMAND,
+    COMMENT
     
 } SymbolType;
+
+
 
 typedef struct Symbol{
     char* name;
@@ -12,4 +18,4 @@ typedef struct Symbol{
 }Symbol;
 
 
-Symbol* generateSymbol(char* t);
+Symbol* generateSymbol(char* token);
