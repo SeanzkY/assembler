@@ -1,0 +1,94 @@
+#include "stdio.h"
+#include "stdlib.h"
+#include <string.h>
+#include "symbolGenerator.h"
+
+#define END_SENTENCE '\n'
+#define STRING_LITERAL_WRAPPER '\''
+#define DATA_LITERAL_SEPARATOR ','
+#define FIRST_WORD_SEPARATOR ' '
+
+void skipSpaces(char** wordStart){
+    while(**wordStart && **wordStart == ' '){
+        (*wordStart)++;
+    }
+}
+
+void trimEndSpaces(char** wordStart){
+    int firstSpacePos = strchr(*wordStart, ' ') - *wordStart;
+    (*wordStart)[firstSpacePos] = '\0';
+    
+}
+
+char* strCopyWord(char* start, char* end){
+    char* result;
+    printf("result size is %ld\n", (end-start + 2));
+    result = malloc((end-start + 2) * sizeof(char));
+    strncpy(result, start ,end-start + 1);
+    result[end-start+1] = '\0';
+    return result;
+}
+
+/*this function is only for string literal - wrapped by STRING_LITERAL_WRAPPER*/
+char* getNextWordStrLiteral(char** wordStart){
+    char* currStr;
+    skipSpaces(wordStart);
+    if(!**wordStart){
+        return NULL;
+    }
+    currStr = *wordStart;
+    /*incase of string value*/
+    if(*currStr == STRING_LITERAL_WRAPPER){
+        currStr++;
+        while(*currStr && *currStr != END_SENTENCE && *currStr != STRING_LITERAL_WRAPPER){
+            currStr++;
+        }
+        if(*currStr == STRING_LITERAL_WRAPPER){
+            return strCopyWord(*wordStart, currStr);
+        }
+        else
+            return NULL;
+    }
+    return NULL;
+}
+
+/*this function is only for params - .data params and command param - separated by DATA_LITERAL_SEPARATOR*/
+char* getNextWordParams(char** wordStart){
+    char* currStr;
+    char* res;
+    skipSpaces(wordStart);
+      if(!**wordStart){
+        return NULL;
+    }
+    currStr = *wordStart;
+    while(*currStr && *currStr != END_SENTENCE && *currStr != DATA_LITERAL_SEPARATOR){
+        currStr++;
+    }
+    res = strCopyWord(*wordStart, currStr);
+    trimEndSpaces(&res);
+    return res;
+}
+
+/*this function is only for the first word in the line - its always separate the other by FIRST_WORD_SEPARATOR*/
+char* getFirstWord(char** lineStart){
+    char* currStr;
+    skipSpaces(lineStart);
+    currStr = *lineStart;
+    while(*currStr && *currStr != END_SENTENCE && *currStr != FIRST_WORD_SEPARATOR){
+        currStr++;
+    }
+    return strCopyWord(*lineStart, currStr);
+}
+
+char** splitLine(char** lineStart){
+    Symbol* firstTokenRes = NULL;
+    char* currStr;
+    while(**lineStart && **lineStart != END_SENTENCE){
+        if(firstTokenRes){
+
+        }
+        else{
+            firstTokenRes = generateSymbol(getFirstWord);
+        }
+    }
+}
