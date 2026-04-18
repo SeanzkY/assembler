@@ -34,7 +34,7 @@ void closeFile(){
     lineCounter = 0;
 }
 
-int getCurrLineCoutner(){
+int getCurrLineCouter(){
     return lineCounter;
 }
 

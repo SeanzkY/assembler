@@ -25,7 +25,6 @@ void trimEndSpaces(char** wordStart){
 
 char* strCopyWord(char* start, char* end){
     char* result;
-    printf("result size is %ld\n", (end-start + 2));
     result = malloc((end-start + 2) * sizeof(char));
     strncpy(result, start ,end-start + 1);
     result[end-start+1] = '\0';
@@ -67,20 +66,29 @@ char* getNextWordParams(char** wordStart){
     while(*currStr && *currStr != END_SENTENCE && *currStr != DATA_LITERAL_SEPARATOR){
         currStr++;
     }
-    res = strCopyWord(*wordStart, currStr);
+    res = strCopyWord(*wordStart, currStr-1);
     trimEndSpaces(&res);
+    *wordStart = currStr;
     return res;
 }
 
 /*this function is only for the first word in the line - its always separate the other by FIRST_WORD_SEPARATOR*/
 char* getFirstWord(char** lineStart){
     char* currStr;
+    char* res;
     skipSpaces(lineStart);
     currStr = *lineStart;
     while(*currStr && *currStr != END_SENTENCE && *currStr != FIRST_WORD_SEPARATOR){
         currStr++;
     }
-    return strCopyWord(*lineStart, currStr);
+    res = strCopyWord(*lineStart, currStr-1);
+    *lineStart = currStr;
+    return res;
+}
+
+char* peekFirstWord(char* lineStart){
+    char* cpyLineStart = lineStart;
+    return getFirstWord(&cpyLineStart);
 }
 
 /*this function returns*/

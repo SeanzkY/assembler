@@ -7,4 +7,7 @@
 int readLineSuccess(char** buffer, FILE* file, int lineCouter);
 
 
-int isMacroValid(MacroList* macroLst, char* line, char* macroName);
+int isMacroValid(MacroList* macroLst, char* line, char* macroName, int lineCounter);
+
+
+int isSavedKeyWord(char* name);

@@ -1,7 +1,7 @@
 
 
 
-int getCurrLineCoutner();
+int getCurrLineCouter();
 
 int readNextLine(char** buffer);
 

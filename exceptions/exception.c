@@ -47,7 +47,17 @@ int readLineSuccess(char** buffer, FILE* file, int lineCouter){
     return isSuccess;
 }
 
-int isMacroValid(MacroList* macroLst, char* line, char* macroName){
+int isSavedKeyWord(char* name){
+    int i;
+     for(i=0;i<sizeof(savedKeywords)/ sizeof(char*);i++){
+        if(strcmp(name, savedKeywords[i]) == 0){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int isMacroValid(MacroList* macroLst, char* line, char* macroName, int lineCounter){
     int i;
     while(macroLst){
         if(strcmp(macroLst->value->name, macroName) == 0){
@@ -56,11 +66,9 @@ int isMacroValid(MacroList* macroLst, char* line, char* macroName){
         }
         macroLst = macroLst->next;
     }
-    for(i=0;i<sizeof(savedKeywords)/ sizeof(char*);i++){
-        if(strcmp(macroName, savedKeywords[i]) == 0){
-            printf("macro %s is a saved keyword\n", macroName);
-            return 0;
-        }
+    if(isSavedKeyWord(macroName)){
+        printf("macro %s is a saved keyword line: %d\n", macroName, lineCounter);
+        return 0;
     }
     return 1;
 }
