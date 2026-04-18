@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 CommandData commands[16] = {
     {"mov", -1, 0, 0, NULL, NULL },
@@ -32,7 +33,7 @@ Symbol* allocateSymbol(char* token, SymbolType type){
 
 Symbol* isCommand(char* token){
     int i;
-    printf("passing on: %d lines\n", sizeof(commands) / sizeof(CommandData));
+    printf("passing on: %ld lines\n", sizeof(commands) / sizeof(CommandData));
     for(i=0;i<sizeof(commands) / sizeof(CommandData);i++){
         if(strcmp(commands[i].command, token) == 0){
             return allocateSymbol(token, COMMAND);
@@ -44,26 +45,34 @@ Symbol* isCommand(char* token){
 Symbol* isLabel(char* token){
     if(token && token[strlen(token) - 1] == ':')
         return allocateSymbol(token, LABEL);
+    return NULL;
 }
 
 Symbol* isDeclaration(char* token){
      if(token && token[strlen(token) - 1] == '.')
         return allocateSymbol(token, DECLARATION);
+    return NULL;
 }
 
 Symbol* isComment(char* token){
     if(token && token[strlen(token) - 1] == ';')
         return allocateSymbol(token, COMMENT);
+    return NULL;
 }
 
 
 Symbol* generateSymbol(char* token){
     int i;
-    Symbol* res[] = {isCommand(token), isDeclaration(token), isComment(token), isLabel(token)};
-    printf("passing on: %d lines\n", sizeof(res) / sizeof(Symbol*));
-    for(i=0; i < sizeof(res) / sizeof(Symbol*)){
+    Symbol* res[4];
+    res[0] = isCommand(token);
+    res[1] = isDeclaration(token);
+    res[2] = isComment(token);
+    res[3] = isLabel(token);
+    printf("passing on: %ld lines\n", sizeof(res) / sizeof(Symbol*));
+    for(i=0; i < sizeof(res) / sizeof(Symbol*);i++){
         if(res[i])
             return res[i];
     }
+    return NULL;
 
 }

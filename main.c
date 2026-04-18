@@ -3,14 +3,16 @@
 #include <string.h>
 
 #include "tokenization/tokenizer.h"
+#include "macros/preprocess.h"
 
 int main(){
     char* x = (char*)malloc(100);
-    char* res;
+    char* res = NULL;
     strcpy(x, " data1c ,   data2 ");
-    res = getNextWordParams(&x);
+    writeMacroFile("code");
     if(!res)
         return 0;
     printf("%ss\n",res);
     return 0;
+
 }

@@ -1,5 +1,5 @@
-#include "stdio.h"
-#include "stdlib.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "symbolGenerator.h"
 
@@ -15,8 +15,11 @@ void skipSpaces(char** wordStart){
 }
 
 void trimEndSpaces(char** wordStart){
-    int firstSpacePos = strchr(*wordStart, ' ') - *wordStart;
-    (*wordStart)[firstSpacePos] = '\0';
+    if(strchr(*wordStart, ' ')){
+        int firstSpacePos = strchr(*wordStart, ' ') - *wordStart;
+        (*wordStart)[firstSpacePos] = '\0';
+    }
+    
     
 }
 
@@ -80,13 +83,13 @@ char* getFirstWord(char** lineStart){
     return strCopyWord(*lineStart, currStr);
 }
 
-char** splitLine(char** lineStart){
+/*this function returns*/
+void splitLine(char** lineStart){
     Symbol* firstTokenRes = NULL;
-    char* currStr;
     while(**lineStart && **lineStart != END_SENTENCE){
         if(firstTokenRes){
             if(firstTokenRes->type == LABEL){
-                firstTokenRes = generateSymbol(getFirstWord);
+                firstTokenRes = generateSymbol(getFirstWord(lineStart));
             }
             else if(firstTokenRes->type == COMMAND){
                 while(**lineStart && **lineStart != END_SENTENCE){
@@ -95,7 +98,7 @@ char** splitLine(char** lineStart){
             }
             else if(firstTokenRes->type == DECLARATION){
                 if(strcmp(firstTokenRes->name, ".string") == 0){
-                    getNextWordStrLiteral(firstTokenRes->name);
+                    getNextWordStrLiteral(lineStart);
                 }
                 else if(strcmp(firstTokenRes->name, ".data") == 0){
                     while(**lineStart && **lineStart != END_SENTENCE){
@@ -108,7 +111,7 @@ char** splitLine(char** lineStart){
             }
         }
         else{
-            firstTokenRes = generateSymbol(getFirstWord);
+            firstTokenRes = generateSymbol(getFirstWord(lineStart));
         }
     }
 }
