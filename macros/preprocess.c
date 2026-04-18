@@ -100,7 +100,6 @@ void writeMacroFile(char* fileNameWithoutExtension){
     success = readNextLine(&currLine);
     while(currLine){
         currLineStart = currLine;
-        /*printf("curr line is %s\n", currLine);*/
         currWord = peekFirstWord(currLine);
         if(strcmp(currWord ,"mcro") == 0){
             getFirstWord(&currLine);
