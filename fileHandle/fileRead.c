@@ -39,7 +39,8 @@ int getCurrLineCoutner(){
 }
 
 int readNextLine(char** buffer){
+    int res;
     lineCounter++;
-    int res = readLineSuccess(buffer, file,lineCounter);
+    res = readLineSuccess(buffer, file,lineCounter);
     return res;
 }

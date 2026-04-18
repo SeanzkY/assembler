@@ -1,5 +1,8 @@
 
 
+#ifndef MY_HEADER_H
+#define MY_HEADER_H
+
 
 typedef struct Macro{
     char* name;
@@ -14,3 +17,5 @@ typedef struct MacroList{
 
 
 void writeMacroFile(char* fileNameWithoutExtension);
+
+#endif 

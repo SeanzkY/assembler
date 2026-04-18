@@ -1,5 +1,9 @@
+
+#pragma once
+
 #include "preprocess.h"
 #include "../fileHandle/fileRead.h"
+#include "../exceptions/exception.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -26,6 +30,9 @@ int addMacroToList(MacroList** macroLst, char* line, char* macroName){
     int commandsSize = 0;
     if(currWord){
         printf("error in macro not supposed to appear after macro name \n");
+    }
+    if(!isMacroValid(*macroLst, line, macroName)){
+        return 0;
     }
     readNextLine(&currLine);
     while(currLine && !strstr(currLine, "mcroend")){
@@ -55,7 +62,6 @@ MacroList* generateMacroData(){
     MacroList* macrosStart = NULL;
     char* currLine;
     int success = readNextLine(&currLine);
-    int isError = 0;
     char* currWord;
     while(currLine){
         currWord = strtok(currLine, " ,\n");

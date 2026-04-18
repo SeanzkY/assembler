@@ -7,6 +7,12 @@
 #include "./exception.h"
 
 
+
+
+char* savedKeywords[] = {"mov", "cmp", "add", "sub", "lea", "clr","not","inc","dec","jmp","bne","jsr","red"
+    ,"prn","rst","stop", ".entry", ".extern", "string", ".data", "mcrogen","r0","r1","r2","r3","r4","r5"
+    ,"r6","r7"};
+
 int isEndOfFile(FILE* file){
     long pos = ftell(file);     
     int res = fgetc(file) == EOF;
@@ -14,6 +20,8 @@ int isEndOfFile(FILE* file){
     return res;
     
 }
+
+
 
 /*reads line into buffer and return 0 if the line is too long*/
 int readLineSuccess(char** buffer, FILE* file, int lineCouter){
@@ -37,6 +45,24 @@ int readLineSuccess(char** buffer, FILE* file, int lineCouter){
     }   
     free(temp);
     return isSuccess;
+}
+
+int isMacroValid(MacroList* macroLst, char* line, char* macroName){
+    int i;
+    while(macroLst){
+        if(strcmp(macroLst->value->name, macroName) == 0){
+            printf("macro %s already exists\n", macroName);
+            return 0;
+        }
+        macroLst = macroLst->next;
+    }
+    for(i=0;i<sizeof(savedKeywords)/ sizeof(char*);i++){
+        if(strcmp(macroName, savedKeywords[i]) == 0){
+            printf("macro %s is a saved keyword\n", macroName);
+            return 0;
+        }
+    }
+    return 1;
 }
 
 int isSymbolSyntaxException(Symbol* s, int line);
