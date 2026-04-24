@@ -47,7 +47,7 @@ LabelTable* createLabelTable(char* fileName){
     Symbol* currSymbol, *labelSymbol;
     LabelData* labelTemp;
     LabelTable* table = initTable();
-    int ic = IC_START, dc = DC_START,  isLabel=0;;
+    int ic = IC_START, dc = DC_START,  isLabel=0, i;
     openFile(fileName, ".am");
     readNextLine(&line);
     while(line){
@@ -64,18 +64,19 @@ LabelTable* createLabelTable(char* fileName){
         }
         else if(currSymbol->type == DECLARATION){
             if(strcmp(currSymbol->name, ".string") == 0 ){
-                strLiteralToBinary(line, &dc);
                 if(isLabel){
                     isLabel = 0;
                     addToTable(table, generateLabelData(labelSymbol->name, dc, DATA));
                 }
+                strLiteralToBinary(line, &dc);
             }
             else if(strcmp(currSymbol->name, ".data") == 0){
-                dataLiteralToBinary(line, &dc);
-                 if(isLabel){
+                if(isLabel){
                     isLabel = 0;
                     addToTable(table, generateLabelData(labelSymbol->name, dc, DATA));
                 }
+                dataLiteralToBinary(line, &dc);
+                
             }
             else if(strcmp(currSymbol->name, ".extern") == 0){
                 labelTemp = getLabelFromTable(table, currSymbol->name);
@@ -119,6 +120,12 @@ LabelTable* createLabelTable(char* fileName){
         }
         
     }
+    for(i=0;i<table->size;i++){
+        if(table->labels[i]->attr == DATA){
+            table->labels[i]->address += ic;
+        }
+    }
+    closeFile();
     printf("icf is %d\n", ic);
     return table;
 }

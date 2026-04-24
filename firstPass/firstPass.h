@@ -1,4 +1,8 @@
 
+
+#ifndef firstPass
+#define firstPass
+
 #define IC_START 100
 #define DC_START 0
 
@@ -6,7 +10,6 @@
 typedef enum Attribute {
     CODE,
     DATA,
-    ENTRY,
     EXTERNAL,
     DATA_AND_ENTRY,
     CODE_AND_ENTRY
@@ -33,3 +36,4 @@ LabelData* getLabelFromTable(LabelTable* table, char* labelName);
 
 LabelTable* createLabelTable(char* fileName);
 
+#endif 

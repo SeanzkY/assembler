@@ -10,6 +10,9 @@ typedef struct binaryList
 
 
 
+binaryList* initBinaryList();
+
+void addTwoBinaryLists(binaryList* lst1, binaryList* lst2);
 
 binaryList* strLiteralToBinary(char* strLiteral, int* dc);
 

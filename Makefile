@@ -1,5 +1,5 @@
-main: main.o tokenizer.o symbolGenerator.o preprocess.o exception.o fileRead.o fileWrite.o firstPass.o binaryGenerator.o
-	gcc -Wall -ansi -pedantic -g -o main main.o tokenizer.o symbolGenerator.o preprocess.o exception.o fileRead.o fileWrite.o firstPass.o binaryGenerator.o
+main: main.o tokenizer.o symbolGenerator.o preprocess.o exception.o fileRead.o fileWrite.o firstPass.o binaryGenerator.o secondPass.o
+	gcc -Wall -ansi -pedantic -g -o main main.o tokenizer.o symbolGenerator.o preprocess.o exception.o fileRead.o fileWrite.o firstPass.o binaryGenerator.o secondPass.o
 
 main.o: main.c tokenization/tokenizer.h firstPass/firstPass.h
 	gcc -Wall -ansi -pedantic -g -c main.c
@@ -24,6 +24,9 @@ exception.o: exceptions/exception.c exceptions/exception.h
 
 firstPass.o: firstPass/firstPass.c firstPass/firstPass.h fileHandle/fileRead.h tokenization/symbolGenerator.h CodeGeneration/binaryGenerator.h tokenization/tokenizer.h CodeGeneration/binaryGenerator.h
 	gcc -Wall -ansi -pedantic -g -c firstPass/firstPass.c
+
+secondPass.o: secondPass/secondPass.c firstPass/firstPass.h secondPass/secondPass.c
+	gcc -Wall -ansi -pedantic -g -c secondPass/secondPass.c
 
 binaryGenerator.o: CodeGeneration/binaryGenerator.c CodeGeneration/binaryGenerator.h
 	gcc -Wall -ansi -pedantic -g -c CodeGeneration/binaryGenerator.c

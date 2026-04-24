@@ -85,7 +85,6 @@ binaryList* commandToBinary(char* command, char* line , int* ic){
     buffer = getNextWordParams(&line);
     (*ic)++;
     while(buffer && strlen(buffer) != 0){
-        printf("param is %s\n", buffer);
         buffer = getNextWordParams(&line);
         (*ic)++;
     }
