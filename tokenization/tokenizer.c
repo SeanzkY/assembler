@@ -54,7 +54,8 @@ char* getNextWordStrLiteral(char** wordStart){
     return NULL;
 }
 
-/*this function is only for params - .data params and command param - separated by DATA_LITERAL_SEPARATOR*/
+/*this function is only for params - .data params and command param - separated by DATA_LITERAL_SEPARATOR
+it will change wordStart to point to the sentence after the word it returned*/
 char* getNextWordParams(char** wordStart){
     char* currStr;
     char* res;

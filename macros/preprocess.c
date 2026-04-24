@@ -129,5 +129,6 @@ void writeMacroFile(char* fileNameWithoutExtension){
         success = readNextLine(&currLine);
     }
     closeFile();
+    closeFileWrite();
     freeMacroList(macrosStart);
 }

@@ -56,12 +56,13 @@ binaryList* strLiteralToBinary(char* strLiteral, int* dc){
 }
 
 binaryList* dataLiteralToBinary(char* dataLiteral, int* dc){
-    char* numericString, *buffer;
-    unsigned int decimalNumber;
+    char *buffer;
+    int decimalNumber;
     binaryList* res = initBinaryList();
     buffer = getNextWordParams(&dataLiteral);
-    while(buffer){
-        if(sscanf(numericString, "%u", &decimalNumber) != 1) 
+    printf("data is %s\n", buffer);
+        while(buffer && strlen(buffer) != 0){
+        if(sscanf(buffer, "%d", &decimalNumber) != 1) 
         {   
             printf("unexpected error - incorrect data input format\n");
             return NULL;

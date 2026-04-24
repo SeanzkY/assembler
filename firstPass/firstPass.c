@@ -53,6 +53,11 @@ LabelTable* createLabelTable(char* fileName){
         lineStart = line;
         buffer = getFirstWord(&line);
         currSymbol = generateSymbol(buffer);
+        printf("buffer is %s\n", buffer);
+        if(!currSymbol){
+            printf("command: %s doesnt exist\n", buffer);
+            return NULL;
+        }
         if(currSymbol->type == LABEL){
             isLabel = 1;
             labelSymbol = currSymbol;
@@ -67,19 +72,21 @@ LabelTable* createLabelTable(char* fileName){
             }
             else if(strcmp(currSymbol->name, ".data") == 0){
                 dataLiteralToBinary(line, &dc);
+
                  if(isLabel){
                     addToTable(table, generateLabelData(labelSymbol->name, dc, DATA));
                 }
             }
-            else if(strcmp(currSymbol->name, ".external") == 0){
+            else if(strcmp(currSymbol->name, ".extern") == 0){
                 labelTemp = getLabelFromTable(table, labelSymbol->name);
-                if(labelTemp->attr != EXTERNAL){
+                if(labelTemp && labelTemp->attr != EXTERNAL){
                     printf("error label: %s\n is in the table as external and as not external\n", labelTemp->name);
                     free(labelTemp);
                 }
                 else{
-                    dataLiteralToBinary(line, &dc);
-                    addToTable(table, generateLabelData(currSymbol->name, 0, ENTRY));
+                    free(buffer);
+                    buffer = getFirstWord(&line);
+                    addToTable(table, generateLabelData(buffer, 0, EXTERNAL));
                 }
                 
             }

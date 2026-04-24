@@ -76,7 +76,7 @@ Symbol* isLabel(char* token){
 }
 
 Symbol* isDeclaration(char* token){
-     if(token && token[strlen(token) - 1] == '.')
+     if(token && token[0] == '.')
         return allocateSymbol(token, DECLARATION);
     return NULL;
 }
@@ -95,7 +95,6 @@ Symbol* generateSymbol(char* token){
     res[1] = isDeclaration(token);
     res[2] = isComment(token);
     res[3] = isLabel(token);
-    printf("passing on: %ld lines\n", sizeof(res) / sizeof(Symbol*));
     for(i=0; i < sizeof(res) / sizeof(Symbol*);i++){
         if(res[i])
             return res[i];
