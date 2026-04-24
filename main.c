@@ -25,8 +25,13 @@ int main(){
         return 0;
 
     */
+   int i;
     writeMacroFile("code");    
-    createLabelTable("code");
+    LabelTable* x = createLabelTable("code");
+    printf("size is %d\n ", x->size);
+    for(i=0;i<x->size;i++){
+        printf("%s %d\n",x->labels[i]->name, x->labels[i]->address);
+    }
 
     
     return 0;

@@ -41,8 +41,10 @@ binaryData* intToBinary(unsigned int decimalNumber){
 
 binaryList* strLiteralToBinary(char* strLiteral, int* dc){
     binaryList* res = initBinaryList();
-    int size = strlen(strLiteral) - 1, i;
-    if(strLiteral[0] != strLiteral[size] || strLiteral[0] == '\"'){
+    int size, i;
+    strLiteral = getNextWordStrLiteral(&strLiteral);
+    size =  strlen(strLiteral) - 1;
+    if(strLiteral[0] != strLiteral[size] || strLiteral[0] != '\"'){
         printf("unexpected error - incorrect string input format\n");
         return NULL;
     }
@@ -60,8 +62,8 @@ binaryList* dataLiteralToBinary(char* dataLiteral, int* dc){
     int decimalNumber;
     binaryList* res = initBinaryList();
     buffer = getNextWordParams(&dataLiteral);
-    printf("data is %s\n", buffer);
         while(buffer && strlen(buffer) != 0){
+        printf("data is %s\n", buffer);
         if(sscanf(buffer, "%d", &decimalNumber) != 1) 
         {   
             printf("unexpected error - incorrect data input format\n");
@@ -77,11 +79,14 @@ binaryList* dataLiteralToBinary(char* dataLiteral, int* dc){
     return res;
 }
 
-binaryList* commandToBinary(char* command){
+binaryList* commandToBinary(char* command, char* line , int* ic){
 
     char* buffer;
-    buffer = getNextWordParams(&command);
-    while(buffer){
-
+    buffer = getNextWordParams(&line);
+    (*ic)++;
+    while(buffer && strlen(buffer) != 0){
+        printf("param is %s\n", buffer);
+        buffer = getNextWordParams(&line);
+        (*ic)++;
     }
 }

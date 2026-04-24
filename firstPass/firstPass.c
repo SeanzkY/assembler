@@ -10,7 +10,8 @@
 
 LabelData* generateLabelData(char* name,  int address, LabelType attr){
     LabelData* res = (LabelData*)malloc(sizeof(LabelData));
-    res->name = name;
+    res->name = (char*)malloc((strlen(name) + 1) * sizeof(char));
+    strcpy(res->name, name);
     res->address = address;
     res->attr = attr;
     return res;
@@ -53,7 +54,6 @@ LabelTable* createLabelTable(char* fileName){
         lineStart = line;
         buffer = getFirstWord(&line);
         currSymbol = generateSymbol(buffer);
-        printf("buffer is %s\n", buffer);
         if(!currSymbol){
             printf("command: %s doesnt exist\n", buffer);
             return NULL;
@@ -63,25 +63,24 @@ LabelTable* createLabelTable(char* fileName){
             labelSymbol = currSymbol;
         }
         else if(currSymbol->type == DECLARATION){
-            isLabel = 0;
             if(strcmp(currSymbol->name, ".string") == 0 ){
                 strLiteralToBinary(line, &dc);
                 if(isLabel){
+                    isLabel = 0;
                     addToTable(table, generateLabelData(labelSymbol->name, dc, DATA));
                 }
             }
             else if(strcmp(currSymbol->name, ".data") == 0){
                 dataLiteralToBinary(line, &dc);
-
                  if(isLabel){
+                    isLabel = 0;
                     addToTable(table, generateLabelData(labelSymbol->name, dc, DATA));
                 }
             }
             else if(strcmp(currSymbol->name, ".extern") == 0){
-                labelTemp = getLabelFromTable(table, labelSymbol->name);
+                labelTemp = getLabelFromTable(table, currSymbol->name);
                 if(labelTemp && labelTemp->attr != EXTERNAL){
-                    printf("error label: %s\n is in the table as external and as not external\n", labelTemp->name);
-                    free(labelTemp);
+                    printf("error label: %s is in the table as external and as not external\n", currSymbol->name);
                 }
                 else{
                     free(buffer);
@@ -96,8 +95,8 @@ LabelTable* createLabelTable(char* fileName){
          
         }
         else if(currSymbol->type == COMMAND){
-            isLabel = 0;
             if(isLabel){
+                isLabel = 0;
                 labelTemp = getLabelFromTable(table, labelSymbol->name);
                 if(labelTemp){
                     printf("error label: %s\n is in the table as external and as not external\n", labelTemp->name);
@@ -107,15 +106,19 @@ LabelTable* createLabelTable(char* fileName){
                     addToTable(table, generateLabelData(labelSymbol->name, ic, CODE));
                 }      
             }
+            commandToBinary(currSymbol->name, line, &ic);
         }
         else if(currSymbol->type == COMMENT){
-            
         }
         else{
             printf("inexistent command found: %s\n", currSymbol->name);
         }
-        free(buffer);
-        readNextLine(&line);
+        if(!isLabel){
+            free(buffer);
+            readNextLine(&line);
+        }
+        
     }
+    printf("icf is %d\n", ic);
     return table;
 }
