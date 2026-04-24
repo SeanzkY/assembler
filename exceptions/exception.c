@@ -58,7 +58,6 @@ int isSavedKeyWord(char* name){
 }
 
 int isMacroValid(MacroList* macroLst, char* line, char* macroName, int lineCounter){
-    int i;
     while(macroLst){
         if(strcmp(macroLst->value->name, macroName) == 0){
             printf("macro %s already exists\n", macroName);

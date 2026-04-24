@@ -24,6 +24,35 @@ CommandData commands[16] = {
     {"stop", -1, 0, 15, NULL, NULL }
 };
 
+
+CommandData* getCommandData(char* command){
+    int i;
+    CommandData* res;
+    for(i=0;i<sizeof(commands) / sizeof(CommandData);i++){
+        if(strcmp(commands[i].command, command) == 0){
+            res = (CommandData*)malloc(sizeof(CommandData));
+            *res =  commands[i];
+            return res;
+        }
+    }
+    return NULL;
+}
+
+
+int getCommandFunct(char* command){
+    CommandData* res = getCommandData(command);
+    int funct = res->funct;
+    free(res);
+    return funct;
+}
+
+int getCommandOpcode(char* command){
+    CommandData* res = getCommandData(command);
+    int opCode = res->opCode;
+    free(res);
+    return opCode;
+}   
+
 Symbol* allocateSymbol(char* token, SymbolType type){
     Symbol* res = (Symbol*)malloc(sizeof(Symbol));
     res->name = token;
@@ -32,12 +61,10 @@ Symbol* allocateSymbol(char* token, SymbolType type){
 }
 
 Symbol* isCommand(char* token){
-    int i;
-    printf("passing on: %ld lines\n", sizeof(commands) / sizeof(CommandData));
-    for(i=0;i<sizeof(commands) / sizeof(CommandData);i++){
-        if(strcmp(commands[i].command, token) == 0){
-            return allocateSymbol(token, COMMAND);
-        }
+    CommandData* res = getCommandData(token);
+    if(res){
+        free(res);
+        return allocateSymbol(token, COMMAND);
     }
     return NULL;
 }

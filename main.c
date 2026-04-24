@@ -4,6 +4,7 @@
 
 #include "tokenization/tokenizer.h"
 #include "macros/preprocess.h"
+#include "firstPass/firstPass.h"
 
 int main(){
      /*
@@ -25,6 +26,7 @@ int main(){
 
     */
     writeMacroFile("code");    
+    createLabelTable("code");
 
     
     return 0;
