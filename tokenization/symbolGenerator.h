@@ -15,4 +15,8 @@ typedef struct Symbol{
 }Symbol;
 
 
+int getCommandFunct(char* command);
+
+int getCommandOpcode(char* command);
+
 Symbol* generateSymbol(char* token);

@@ -1,6 +1,7 @@
+#define MAX_BINARY_SIZE 12
 
 typedef struct binaryData{
-    char digits[12];
+    char digits[MAX_BINARY_SIZE];
 }binaryData;
 
 typedef struct binaryList

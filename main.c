@@ -27,12 +27,12 @@ int main(){
 
     */
    int i;
+   
     writeMacroFile("code");    
     LabelTable* x = createLabelTable("code");
     for(i=0;i<x->size;i++){
         printf("%s %d\n",x->labels[i]->name, x->labels[i]->address);
     }
-
     writeBinaryFile("code", x);
     
     return 0;

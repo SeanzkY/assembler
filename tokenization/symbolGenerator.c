@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 CommandData commands[16] = {
     {"mov", -1, 0, 0, NULL, NULL },
     {"cmp", -1, 0, 1, NULL, NULL },
@@ -24,6 +25,39 @@ CommandData commands[16] = {
     {"stop", -1, 0, 15, NULL, NULL }
 };
 
+addressTypesAllowed* createAddressTypeAllowed(int size, AddressType* allowed){
+    int i;
+    addressTypesAllowed* res = (addressTypesAllowed*)malloc(sizeof(addressTypesAllowed));
+    res->size = size;
+    res->address = (AddressType*)malloc(sizeof(AddressType) * size);
+    for(i=0;i<size;i++){
+        res->address[i] = allowed[i];
+    }
+    return res;
+}
+
+void initCommandsAllowed(){
+    int i;
+    addressTypesAllowed* allowed1 = createAddressTypeAllowed(3, (addressTypesAllowed*){IMMEDIATE, DIRECT, REGISTER_DIRECT});
+    addressTypesAllowed* allowed2 = createAddressTypeAllowed(1, (addressTypesAllowed*){DIRECT});
+    addressTypesAllowed* allowed3 = createAddressTypeAllowed(2, (addressTypesAllowed*){DIRECT, REGISTER_DIRECT});
+    addressTypesAllowed* allowed4 = createAddressTypeAllowed(2, (addressTypesAllowed*){DIRECT, RELATIVE});
+    for(i=0;i<4;i++){
+        commands[i].src = allowed1;
+    }
+    commands[4].src = allowed2;
+    
+    commands[1].dst = allowed1;
+    commands[0].dst = allowed3;
+    for(i=2;i<9;i++){
+        commands[i].dst = allowed3;
+    }
+    for(i=9;i<12;i++){
+        commands[i].dst = allowed4;
+    }
+    commands[12].dst = allowed3;
+    commands[13].dst = allowed1;
+}
 
 CommandData* getCommandData(char* command){
     int i;

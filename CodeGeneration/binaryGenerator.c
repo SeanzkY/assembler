@@ -1,5 +1,8 @@
 #include "./binaryGenerator.h"
 #include "../tokenization/tokenizer.h"
+#include "../tokenization/symbolGenerator.h"
+#include "../tokenization/commands.h"
+#include "../firstPass/firstPass.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,6 +25,10 @@ void addToBinaryList(binaryList* lst, binaryData* data){
 
 void addTwoBinaryLists(binaryList* lst1, binaryList* lst2){
     int i;
+    if(!lst2)
+        return lst1;
+    if(!lst1)
+        return lst2;
     for(i=0;i<lst2->size;i++){
         addToBinaryList(lst1, lst2->bin[i]);
     }
@@ -79,13 +86,65 @@ binaryList* dataLiteralToBinary(char* dataLiteral, int* dc){
     return res;
 }
 
-binaryList* commandToBinary(char* command, char* line , int* ic){
+AddressType getAddressType(char* operand){
+    if(operand[0] == '#')
+        return IMMEDIATE;
+    else if(operand[0] == '%')
+        return RELATIVE;
+    else if(operand[0] == 'r' && (operand[1] >= '0' && operand[1] <= '7'))
+        return REGISTER_DIRECT;
+    else
+        return DIRECT;
+}
 
+binaryData* translateOperand(char* operand, AddressType num, int ic){
+    int decimalNumber;
+    if(num == IMMEDIATE){
+        if(sscanf(operand+1, "%d", &decimalNumber) != 1) 
+        {   
+            printf("unexpected error - incorrect data input format\n");
+            return NULL;
+        }
+        return intToBinary(decimalNumber);
+        
+    }
+    else if(num == RELATIVE){
+         /*getLabelFromTable()*/
+        /*need to add: remove % also after get - we do labelAddress - (currAddress+1)*/
+    }
+    else if(num == REGISTER_DIRECT){
+        /*use number of register we got to do: 1 << x then translate to binary*/
+    }
+    else if(num == DIRECT){
+        /*getLabelFromTable()*/
+        /*need to add : to the stuff*/
+    }
+    return NULL;
+}
+
+binaryList* commandToBinary(char* command, char* line , int* ic){
+    return NULL;
     char* buffer;
+    int i = 0;
+    binaryData* temp = (binaryData*)malloc(sizeof(binaryData)), *commandData;
+    binaryList* res = initBinaryList();
+    int operandAddressType[2] = {0,0};
+    addToBinaryList(res,temp);
+    commandData = intToBinary(getCommandOpcode(command));
+    /*command Data is only supposed to reach 4 digits so i need so only it's last 4 digits, and each part of the command has it's own size*/
+    strncpy(temp->digits, commandData->digits + MAX_BINARY_SIZE - 4, 4);
+    commandData = intToBinary(getCommandFunct(command));
+    strncpy(temp->digits + 4, commandData->digits + MAX_BINARY_SIZE - 4, 4);
     buffer = getNextWordParams(&line);
     (*ic)++;
     while(buffer && strlen(buffer) != 0){
         buffer = getNextWordParams(&line);
         (*ic)++;
+        operandAddressType[i] = getAddressType(buffer);        
     }
+    commandData = intToBinary(operandAddressType[0]);
+    strncpy(temp->digits + 8, commandData->digits + MAX_BINARY_SIZE - 2, 2);
+    commandData = intToBinary(operandAddressType[1]);
+    strncpy(temp->digits + 10, commandData->digits + MAX_BINARY_SIZE - 2, 2);
+    return res;
 }

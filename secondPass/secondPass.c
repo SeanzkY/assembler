@@ -57,7 +57,8 @@ void writeBinaryFile(char* fileName, LabelTable* table){
         }
         else if(currSymbol->type == COMMAND){
             isLabel = 0;
-            commandToBinary(currSymbol->name, line, &ic);
+            addTwoBinaryLists(commandsLst ,commandToBinary(currSymbol->name, line, &ic));
+            
         }
         else if(currSymbol->type == COMMENT){
         }
