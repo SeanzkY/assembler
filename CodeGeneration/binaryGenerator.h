@@ -33,3 +33,5 @@ binaryList* dataLiteralToBinary(char* dataLiteral, int* dc);
 
 
 binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* table, char* fileName);
+
+void closeExtFile();

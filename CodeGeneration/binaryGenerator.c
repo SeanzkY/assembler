@@ -107,7 +107,7 @@ AddressType getAddressType(char* operand){
 }
 
 
-void writeExtFile(char* label, int pos, char* fileName){
+int writeExtFile(char* label, int pos, char* fileName){
     int res;
     char* buffer = (char*)malloc(24 + strlen(label) + 10);
     sprintf(buffer, "%s %04u \n", label, pos);        

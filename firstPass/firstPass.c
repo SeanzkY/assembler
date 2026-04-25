@@ -32,9 +32,7 @@ LabelTable* addToTable(LabelTable* table, LabelData* data){
 }
 
 LabelData* getLabelFromTable(LabelTable* table, char* labelName){
-    int i;
-    LabelTable* x = table;
-   
+    int i;   
     for(i=0;i<table->size;i++){
         if(strcmp(table->labels[i]->name,labelName) == 0){
             return table->labels[i];

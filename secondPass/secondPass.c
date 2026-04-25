@@ -104,8 +104,11 @@ void writeBinaryFile(char* fileName, LabelTable* table){
     for(i=0;i<table->size;i++){
         fileBuffer = (char*)malloc(24 + strlen(table->labels[i]->name) + 10);
         if(table->labels[i]->attr == CODE_AND_ENTRY || table->labels[i]->attr == DATA_AND_ENTRY){
-            sprintf(fileBuffer, "%s %04u \n", table->labels[i]->name, table->labels[i]->address);
-             writeNextLine(fileBuffer);
+            temp = (char*)malloc(strlen(table->labels[i]->name));
+            strncpy(temp, table->labels[i]->name,strlen(table->labels[i]->name) - 1);
+            temp[strlen(table->labels[i]->name) - 1] = '\0';
+            sprintf(fileBuffer, "%s %04u \n", temp, table->labels[i]->address);
+            writeNextLine(fileBuffer);
         }
       
         free(fileBuffer);
