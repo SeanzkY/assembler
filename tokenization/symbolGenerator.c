@@ -5,59 +5,31 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define EMPTY_ADDRS_LST {EMPTY_ADDRESS, EMPTY_ADDRESS, EMPTY_ADDRESS, EMPTY_ADDRESS}
+#define ADDRESS_TYPE_1 {IMMEDIATE, DIRECT, REGISTER_DIRECT, EMPTY_ADDRESS}
+#define ADDRESS_TYPE_2  {DIRECT,EMPTY_ADDRESS,EMPTY_ADDRESS,EMPTY_ADDRESS}
+#define ADDRESS_TYPE_3 {DIRECT, REGISTER_DIRECT, EMPTY_ADDRESS, EMPTY_ADDRESS}
+#define ADDRESS_TYPE_4 {DIRECT, RELATIVE, EMPTY_ADDRESS, EMPTY_ADDRESS}
+
 
 CommandData commands[16] = {
-    {"mov", -1, 0, 0, NULL, NULL },
-    {"cmp", -1, 0, 1, NULL, NULL },
-    {"add", 10, 1, 2, NULL, NULL },
-    {"sub", 11, 1, 2, NULL, NULL },
-    {"lea", -1, 0, 4, NULL, NULL },
-    {"clr", 10, 1, 5, NULL, NULL },
-    {"not", 11, 1, 5, NULL, NULL },
-    {"inc", 12, 1, 5, NULL, NULL },
-    {"dec", 13, 1, 5, NULL, NULL },
-    {"jmp", 10, 1, 9, NULL, NULL },
-    {"bne", 11, 1, 9, NULL, NULL },
-    {"jsr", 12, 1, 9, NULL, NULL },
-    {"red", -1, 0, 12, NULL, NULL },
-    {"prn", -1, 0, 13, NULL, NULL },
-    {"rst", -1, 0, 14, NULL, NULL },
-    {"stop", -1, 0, 15, NULL, NULL }
+    {"mov", 0 , 0, ADDRESS_TYPE_1, ADDRESS_TYPE_3},
+    {"cmp", 0 , 1, ADDRESS_TYPE_1, ADDRESS_TYPE_1 },
+    {"add", 10, 2, ADDRESS_TYPE_1, ADDRESS_TYPE_3 },
+    {"sub", 11 , 2, ADDRESS_TYPE_1, ADDRESS_TYPE_3 },
+    {"lea", 0 , 4, ADDRESS_TYPE_2, ADDRESS_TYPE_3 },
+    {"clr", 10 , 5, EMPTY_ADDRS_LST, ADDRESS_TYPE_3},
+    {"not", 11 , 5, EMPTY_ADDRS_LST, ADDRESS_TYPE_3 },
+    {"inc", 12 , 5, EMPTY_ADDRS_LST, ADDRESS_TYPE_3 },
+    {"dec", 13 , 5, EMPTY_ADDRS_LST, ADDRESS_TYPE_3 },
+    {"jmp", 10 , 9, EMPTY_ADDRS_LST, ADDRESS_TYPE_4},
+    {"bne", 11 , 9, EMPTY_ADDRS_LST, ADDRESS_TYPE_4 },
+    {"jsr", 12 , 9, EMPTY_ADDRS_LST, ADDRESS_TYPE_4 },
+    {"red", 0 , 12, EMPTY_ADDRS_LST, ADDRESS_TYPE_3 },
+    {"prn", 0 , 13, EMPTY_ADDRS_LST, ADDRESS_TYPE_1 },
+    {"rst", 0 , 14, EMPTY_ADDRS_LST, EMPTY_ADDRS_LST },
+    {"stop", 0 , 15, EMPTY_ADDRS_LST, EMPTY_ADDRS_LST }
 };
-
-addressTypesAllowed* createAddressTypeAllowed(int size, AddressType* allowed){
-    int i;
-    addressTypesAllowed* res = (addressTypesAllowed*)malloc(sizeof(addressTypesAllowed));
-    res->size = size;
-    res->address = (AddressType*)malloc(sizeof(AddressType) * size);
-    for(i=0;i<size;i++){
-        res->address[i] = allowed[i];
-    }
-    return res;
-}
-
-void initCommandsAllowed(){
-    int i;
-    addressTypesAllowed* allowed1 = createAddressTypeAllowed(3, (addressTypesAllowed*){IMMEDIATE, DIRECT, REGISTER_DIRECT});
-    addressTypesAllowed* allowed2 = createAddressTypeAllowed(1, (addressTypesAllowed*){DIRECT});
-    addressTypesAllowed* allowed3 = createAddressTypeAllowed(2, (addressTypesAllowed*){DIRECT, REGISTER_DIRECT});
-    addressTypesAllowed* allowed4 = createAddressTypeAllowed(2, (addressTypesAllowed*){DIRECT, RELATIVE});
-    for(i=0;i<4;i++){
-        commands[i].src = allowed1;
-    }
-    commands[4].src = allowed2;
-    
-    commands[1].dst = allowed1;
-    commands[0].dst = allowed3;
-    for(i=2;i<9;i++){
-        commands[i].dst = allowed3;
-    }
-    for(i=9;i<12;i++){
-        commands[i].dst = allowed4;
-    }
-    commands[12].dst = allowed3;
-    commands[13].dst = allowed1;
-}
 
 CommandData* getCommandData(char* command){
     int i;

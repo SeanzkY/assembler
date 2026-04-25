@@ -33,7 +33,7 @@ binaryGenerator.o: CodeGeneration/binaryGenerator.c CodeGeneration/binaryGenerat
 
 
 clean:
-	rm -f main main.o tokenizer.o *.ob *.am *.ent *.ext
+	rm -f main *.o *.ob *.am *.ent *.ext
 
 
 

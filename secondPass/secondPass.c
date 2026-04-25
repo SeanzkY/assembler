@@ -9,12 +9,7 @@
 #include "../CodeGeneration/binaryGenerator.h"
 
 
-char* completeToLabel(char* reference){
-    char* res = (char*)malloc((strlen(reference)+2) * sizeof(char));
-    strcpy(res, reference);
-    strcat(res, ":");   
-    return res;
-}
+
 
 void writeBinaryFile(char* fileName, LabelTable* table){
     int i,j;
@@ -57,8 +52,9 @@ void writeBinaryFile(char* fileName, LabelTable* table){
         }
         else if(currSymbol->type == COMMAND){
             isLabel = 0;
-            addTwoBinaryLists(commandsLst ,commandToBinary(currSymbol->name, line, &ic));
-            
+            printf("adding command: %s\n", currSymbol->name);
+            commandToBinary(currSymbol->name, line, &ic, table);
+            /*addTwoBinaryLists(commandsLst ,commandToBinary(currSymbol->name, line, &ic, table));*/
         }
         else if(currSymbol->type == COMMENT){
         }
@@ -67,9 +63,9 @@ void writeBinaryFile(char* fileName, LabelTable* table){
         }
         
     }
-    for(i=0;i<dataLst->size;i++){
+    for(i=0;i<commandsLst->size;i++){
         for(j=0;j<12;j++){
-            printf("%c", dataLst->bin[i]->digits[j]);
+            printf("%c", commandsLst->bin[i]->digits[j]);
         }
         printf("\n");
     }

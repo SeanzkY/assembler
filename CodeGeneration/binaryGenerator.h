@@ -1,5 +1,7 @@
 #define MAX_BINARY_SIZE 12
 
+#include "../firstPass/firstPass.h"
+
 typedef struct binaryData{
     char digits[MAX_BINARY_SIZE];
 }binaryData;
@@ -10,6 +12,7 @@ typedef struct binaryList
 }binaryList;
 
 
+char* completeToLabel(char* reference);
 
 binaryList* initBinaryList();
 
@@ -21,4 +24,4 @@ binaryList* strLiteralToBinary(char* strLiteral, int* dc);
 binaryList* dataLiteralToBinary(char* dataLiteral, int* dc);
 
 
-binaryList* commandToBinary(char* command, char* line , int* ic);
+binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* table);

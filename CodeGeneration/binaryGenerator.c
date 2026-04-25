@@ -25,10 +25,8 @@ void addToBinaryList(binaryList* lst, binaryData* data){
 
 void addTwoBinaryLists(binaryList* lst1, binaryList* lst2){
     int i;
-    if(!lst2)
-        return lst1;
-    if(!lst1)
-        return lst2;
+    if(!lst2 || !lst1)
+        return;
     for(i=0;i<lst2->size;i++){
         addToBinaryList(lst1, lst2->bin[i]);
     }
@@ -43,6 +41,13 @@ binaryData* intToBinary(unsigned int decimalNumber){
     {
         res->digits[MAX_DIGITS_BINARY - 1 - i] = (char)(((decimalNumber >> i) & BIT_MASK) + '0');
     }
+    return res;
+}
+
+char* completeToLabel(char* reference){
+    char* res = (char*)malloc((strlen(reference)+2) * sizeof(char));
+    strcpy(res, reference);
+    strcat(res, ":");   
     return res;
 }
 
@@ -97,8 +102,11 @@ AddressType getAddressType(char* operand){
         return DIRECT;
 }
 
-binaryData* translateOperand(char* operand, AddressType num, int ic){
+binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable* table){
     int decimalNumber;
+    unsigned int res;
+    LabelData* temp;
+    char* operandWithAdder;
     if(num == IMMEDIATE){
         if(sscanf(operand+1, "%d", &decimalNumber) != 1) 
         {   
@@ -109,20 +117,32 @@ binaryData* translateOperand(char* operand, AddressType num, int ic){
         
     }
     else if(num == RELATIVE){
-         /*getLabelFromTable()*/
-        /*need to add: remove % also after get - we do labelAddress - (currAddress+1)*/
+        operandWithAdder = completeToLabel(operand);
+        temp = getLabelFromTable(table, operandWithAdder);
+        if(temp->address - ic + 1 > (1 << (MAX_BINARY_SIZE-1)) - 1 || temp->address - ic + 1 < -1 *(1 << (MAX_BINARY_SIZE-1))){
+            printf("jump out of range\n");
+            return NULL;
+        }
+        decimalNumber = temp->address;
+        free(temp);
+        return intToBinary(decimalNumber - ic + 1);
     }
     else if(num == REGISTER_DIRECT){
-        /*use number of register we got to do: 1 << x then translate to binary*/
+        return intToBinary(1 << (int)(operand[1] -'0'));
     }
     else if(num == DIRECT){
-        /*getLabelFromTable()*/
-        /*need to add : to the stuff*/
+        operandWithAdder = completeToLabel(operand);
+        printf("well %s\n", operandWithAdder);
+
+        temp = getLabelFromTable(table, operandWithAdder);
+        res = (unsigned int)temp->address;
+        free(temp);
+        return intToBinary(res);
     }
     return NULL;
 }
 
-binaryList* commandToBinary(char* command, char* line , int* ic){
+binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* table){
     char* buffer;
     int i = 0;
     binaryData* temp = (binaryData*)malloc(sizeof(binaryData)), *commandData;
@@ -136,14 +156,27 @@ binaryList* commandToBinary(char* command, char* line , int* ic){
     strncpy(temp->digits + 4, commandData->digits + MAX_BINARY_SIZE - 4, 4);
     buffer = getNextWordParams(&line);
     (*ic)++;
-    
     while(buffer && strlen(buffer) != 0){
+
+        if(table){
+             printf("do1 %s\n", buffer);
+            translateOperand(buffer,getAddressType(buffer), *ic, table);
+            printf("do2\n");
+        }
+        
+        /*addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table));*/
         (*ic)++;
-        operandAddressType[i] = getAddressType(buffer);        
+        operandAddressType[i] = getAddressType(buffer); 
+        
         buffer = getNextWordParams(&line);
         
+        i++;
+        
     }
-    
+    if(i==1){
+        operandAddressType[1] = operandAddressType[0];
+        operandAddressType[0] = 0;
+    }
     commandData = intToBinary(operandAddressType[0]);
     strncpy(temp->digits + 8, commandData->digits + MAX_BINARY_SIZE - 2, 2);
     commandData = intToBinary(operandAddressType[1]);
