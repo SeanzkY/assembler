@@ -53,8 +53,7 @@ void writeBinaryFile(char* fileName, LabelTable* table){
         else if(currSymbol->type == COMMAND){
             isLabel = 0;
             printf("adding command: %s\n", currSymbol->name);
-            commandToBinary(currSymbol->name, line, &ic, table);
-            /*addTwoBinaryLists(commandsLst ,commandToBinary(currSymbol->name, line, &ic, table));*/
+            addTwoBinaryLists(commandsLst ,commandToBinary(currSymbol->name, line, &ic, table));
         }
         else if(currSymbol->type == COMMENT){
         }

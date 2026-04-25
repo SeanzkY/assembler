@@ -120,10 +120,14 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
         operandWithAdder = completeToLabel(operand);
         temp = getLabelFromTable(table, operandWithAdder+1);
         if(!temp){
-            printf("fallback to external - need to add check");
+            
             temp = getLabelFromTable(table, operand+1);
-
-        }
+            if(temp->attr == EXTERNAL){
+            
+            }
+            else{
+                printf("fallback to external - need to add check");
+            }
         if(temp->address - ic + 1 > (1 << (MAX_BINARY_SIZE-1)) - 1 || temp->address - ic + 1 < -1 *(1 << (MAX_BINARY_SIZE-1))){
             printf("jump out of range\n");
             return NULL;
@@ -138,8 +142,13 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
         operandWithAdder = completeToLabel(operand);
         temp = getLabelFromTable(table, operandWithAdder);
         if(!temp){
-            printf("fallback to external - need to add check");
             temp = getLabelFromTable(table, operand);
+            if(temp->attr == EXTERNAL){
+                
+            }
+            else{
+                printf("fallback to external - need to add check");
+            }
         }
             
         res = (unsigned int)temp->address;
@@ -165,7 +174,7 @@ binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* tab
     while(buffer && strlen(buffer) != 0){
 
         if(table){
-            translateOperand(buffer,getAddressType(buffer), *ic, table);
+            addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table));
         }
         
         /*addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table));*/

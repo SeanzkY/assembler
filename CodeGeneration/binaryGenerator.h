@@ -2,8 +2,16 @@
 
 #include "../firstPass/firstPass.h"
 
+typedef enum LinkingInfos{
+    A,
+    R,
+    E
+}LinkingInfo;
+
 typedef struct binaryData{
     char digits[MAX_BINARY_SIZE];
+    unsigned int pos;
+    LinkingInfo info;
 }binaryData;
 
 typedef struct binaryList
