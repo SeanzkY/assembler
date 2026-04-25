@@ -123,7 +123,6 @@ binaryData* translateOperand(char* operand, AddressType num, int ic){
 }
 
 binaryList* commandToBinary(char* command, char* line , int* ic){
-    return NULL;
     char* buffer;
     int i = 0;
     binaryData* temp = (binaryData*)malloc(sizeof(binaryData)), *commandData;
@@ -137,11 +136,14 @@ binaryList* commandToBinary(char* command, char* line , int* ic){
     strncpy(temp->digits + 4, commandData->digits + MAX_BINARY_SIZE - 4, 4);
     buffer = getNextWordParams(&line);
     (*ic)++;
+    
     while(buffer && strlen(buffer) != 0){
-        buffer = getNextWordParams(&line);
         (*ic)++;
         operandAddressType[i] = getAddressType(buffer);        
+        buffer = getNextWordParams(&line);
+        
     }
+    
     commandData = intToBinary(operandAddressType[0]);
     strncpy(temp->digits + 8, commandData->digits + MAX_BINARY_SIZE - 2, 2);
     commandData = intToBinary(operandAddressType[1]);
