@@ -34,9 +34,7 @@ LabelTable* addToTable(LabelTable* table, LabelData* data){
 LabelData* getLabelFromTable(LabelTable* table, char* labelName){
     int i;
     LabelTable* x = table;
-    for(i=0;i<x->size;i++){
-        printf("%s %d\n",x->labels[i]->name, x->labels[i]->address);
-    }
+   
     for(i=0;i<table->size;i++){
         if(strcmp(table->labels[i]->name,labelName) == 0){
             return table->labels[i];

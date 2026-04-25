@@ -21,10 +21,8 @@ int openFile(char* fileNameWithoutExtension, char* extension){
     file = fopen(fileName, "r");
     if(!file){
         printf("file %s is an empty file\n", fileName);
-        free(fileName);
         return 0;
     }
-    free(fileName);
     return 1;
 }
 

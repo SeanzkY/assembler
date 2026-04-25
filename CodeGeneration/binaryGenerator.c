@@ -118,13 +118,17 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
     }
     else if(num == RELATIVE){
         operandWithAdder = completeToLabel(operand);
-        temp = getLabelFromTable(table, operandWithAdder);
+        temp = getLabelFromTable(table, operandWithAdder+1);
+        if(!temp){
+            printf("fallback to external - need to add check");
+            temp = getLabelFromTable(table, operand+1);
+
+        }
         if(temp->address - ic + 1 > (1 << (MAX_BINARY_SIZE-1)) - 1 || temp->address - ic + 1 < -1 *(1 << (MAX_BINARY_SIZE-1))){
             printf("jump out of range\n");
             return NULL;
         }
         decimalNumber = temp->address;
-        free(temp);
         return intToBinary(decimalNumber - ic + 1);
     }
     else if(num == REGISTER_DIRECT){
@@ -132,11 +136,13 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
     }
     else if(num == DIRECT){
         operandWithAdder = completeToLabel(operand);
-        printf("well %s\n", operandWithAdder);
-
         temp = getLabelFromTable(table, operandWithAdder);
+        if(!temp){
+            printf("fallback to external - need to add check");
+            temp = getLabelFromTable(table, operand);
+        }
+            
         res = (unsigned int)temp->address;
-        free(temp);
         return intToBinary(res);
     }
     return NULL;
@@ -159,9 +165,7 @@ binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* tab
     while(buffer && strlen(buffer) != 0){
 
         if(table){
-             printf("do1 %s\n", buffer);
             translateOperand(buffer,getAddressType(buffer), *ic, table);
-            printf("do2\n");
         }
         
         /*addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table));*/
