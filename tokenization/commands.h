@@ -2,7 +2,8 @@ typedef enum AddressType{
     IMMEDIATE,
     DIRECT,
     RELATIVE,
-    REGISTER_DIRECT
+    REGISTER_DIRECT,
+    EMPTY_ADDRESS
 }AddressType;
 
 
@@ -15,8 +16,7 @@ typedef struct addressTypesAllowed{
 typedef struct CommandData{
     char* command;
     int funct;
-    int isFunctExist;
     int opCode;
-    addressTypesAllowed* dst;
-    addressTypesAllowed* src;
+    AddressType src[4];
+    AddressType dst[4];
 }CommandData;

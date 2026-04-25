@@ -29,8 +29,6 @@ int readLineSuccess(char** buffer, FILE* file, int lineCouter){
     char* temp  = (char*)malloc(sizeof(char) * (MAX_LINE_SIZE+20));
     *buffer = (char*)malloc(sizeof(char) * (MAX_LINE_SIZE+20));
     if(!fgets(*buffer, (MAX_LINE_SIZE+20), file)){
-        free(temp);
-        free(*buffer);
         *buffer = NULL;
         return 1;
     }
@@ -43,7 +41,6 @@ int readLineSuccess(char** buffer, FILE* file, int lineCouter){
             }
         *buffer = NULL;
     }   
-    free(temp);
     return isSuccess;
 }
 
@@ -58,7 +55,6 @@ int isSavedKeyWord(char* name){
 }
 
 int isMacroValid(MacroList* macroLst, char* line, char* macroName, int lineCounter){
-    int i;
     while(macroLst){
         if(strcmp(macroLst->value->name, macroName) == 0){
             printf("macro %s already exists\n", macroName);

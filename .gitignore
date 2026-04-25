@@ -2,3 +2,6 @@
 main
 *.as
 *.am
+*.ob
+*.ent
+*.ext

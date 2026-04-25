@@ -4,6 +4,9 @@
 
 #include "tokenization/tokenizer.h"
 #include "macros/preprocess.h"
+#include "firstPass/firstPass.h"
+#include "secondPass/secondPass.h"
+#include "CodeGeneration/binaryGenerator.h"
 
 int main(){
      /*
@@ -24,9 +27,15 @@ int main(){
         return 0;
 
     */
+   int i;
+   LabelTable* x;
     writeMacroFile("code");    
-
-    
+    x = createLabelTable("code");
+    for(i=0;i<x->size;i++){
+        printf("%s %d\n",x->labels[i]->name, x->labels[i]->address);
+    }
+    writeBinaryFile("code", x);
+    closeExtFile();
     return 0;
 
 

@@ -19,10 +19,8 @@ int openFileWrite(char* fileNameWithoutExtension, char* extension){
     fileWrite = fopen(fileName, "w");
     if(!fileWrite){
         printf("error in creating file: %s \n", fileName);
-        free(fileName);
         return 0;
     }
-    free(fileName);
     return 1;
 }
 

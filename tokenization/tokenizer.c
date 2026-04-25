@@ -4,7 +4,7 @@
 #include "symbolGenerator.h"
 
 #define END_SENTENCE '\n'
-#define STRING_LITERAL_WRAPPER '\''
+#define STRING_LITERAL_WRAPPER '\"'
 #define DATA_LITERAL_SEPARATOR ','
 #define FIRST_WORD_SEPARATOR ' '
 
@@ -35,11 +35,13 @@ char* strCopyWord(char* start, char* end){
 char* getNextWordStrLiteral(char** wordStart){
     char* currStr;
     skipSpaces(wordStart);
+
     if(!**wordStart){
         return NULL;
     }
     currStr = *wordStart;
     /*incase of string value*/
+    
     if(*currStr == STRING_LITERAL_WRAPPER){
         currStr++;
         while(*currStr && *currStr != END_SENTENCE && *currStr != STRING_LITERAL_WRAPPER){
@@ -54,7 +56,8 @@ char* getNextWordStrLiteral(char** wordStart){
     return NULL;
 }
 
-/*this function is only for params - .data params and command param - separated by DATA_LITERAL_SEPARATOR*/
+/*this function is only for params - .data params and command param - separated by DATA_LITERAL_SEPARATOR
+it will change wordStart to point to the sentence after the word it returned*/
 char* getNextWordParams(char** wordStart){
     char* currStr;
     char* res;
@@ -68,7 +71,7 @@ char* getNextWordParams(char** wordStart){
     }
     res = strCopyWord(*wordStart, currStr-1);
     trimEndSpaces(&res);
-    *wordStart = currStr;
+    *wordStart = (currStr+1);
     return res;
 }
 
@@ -91,7 +94,8 @@ char* peekFirstWord(char* lineStart){
     return getFirstWord(&cpyLineStart);
 }
 
-/*this function returns*/
+/*this function returns
+
 void splitLine(char** lineStart){
     Symbol* firstTokenRes = NULL;
     while(**lineStart && **lineStart != END_SENTENCE){
@@ -123,3 +127,4 @@ void splitLine(char** lineStart){
         }
     }
 }
+    */
