@@ -32,4 +32,4 @@ binaryList* strLiteralToBinary(char* strLiteral, int* dc);
 binaryList* dataLiteralToBinary(char* dataLiteral, int* dc);
 
 
-binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* table);
+binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* table, char* fileName);

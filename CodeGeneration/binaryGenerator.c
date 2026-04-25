@@ -3,12 +3,15 @@
 #include "../tokenization/symbolGenerator.h"
 #include "../tokenization/commands.h"
 #include "../firstPass/firstPass.h"
+#include "../fileHandle/fileWrite.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 #define MAX_DIGITS_BINARY 12 
+
+FILE* extFile = NULL;
 
 binaryList* initBinaryList(){
     binaryList* res = (binaryList*)malloc(sizeof(binaryList));
@@ -77,7 +80,6 @@ binaryList* dataLiteralToBinary(char* dataLiteral, int* dc){
     binaryList* res = initBinaryList();
     buffer = getNextWordParams(&dataLiteral);
         while(buffer && strlen(buffer) != 0){
-        printf("data is %s\n", buffer);
         if(sscanf(buffer, "%d", &decimalNumber) != 1) 
         {   
             printf("unexpected error - incorrect data input format\n");
@@ -104,10 +106,31 @@ AddressType getAddressType(char* operand){
         return DIRECT;
 }
 
-binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable* table){
+
+void writeExtFile(char* label, int pos, char* fileName){
+    int res;
+    char* buffer = (char*)malloc(24 + strlen(label) + 10);
+    sprintf(buffer, "%s %04u \n", label, pos);        
+    if(!extFile){
+        char* fullFileName = addExtenstionToNameWrite(fileName, ".ext");
+        extFile = fopen(fullFileName, "w");
+    }
+    res = fputs(buffer, extFile);
+    return res;
+}
+
+void closeExtFile(){
+    if(extFile){
+        fclose(extFile);
+        extFile = NULL;
+    }
+}
+
+binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable* table, char* fileName){
     int decimalNumber;
     unsigned int res;
     LabelData* temp;
+    LinkingInfo info = A;
     char* operandWithAdder;
     if(num == IMMEDIATE){
         if(sscanf(operand+1, "%d", &decimalNumber) != 1) 
@@ -125,7 +148,8 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
             
             temp = getLabelFromTable(table, operand+1);
             if(temp->attr == EXTERNAL){
-            
+                writeExtFile(temp->name, ic, fileName);
+                info = E;
             }
             else{
                 printf("fallback to external - need to add check");
@@ -136,7 +160,7 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
             return NULL;
         }
         decimalNumber = temp->address;
-        return intToBinary(decimalNumber - (ic), A, ic);
+        return intToBinary(decimalNumber - (ic), info, ic);
     }
     else if(num == REGISTER_DIRECT){
         return intToBinary(1 << (int)(operand[1] -'0'), A, ic);
@@ -144,10 +168,12 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
     else if(num == DIRECT){
         operandWithAdder = completeToLabel(operand);
         temp = getLabelFromTable(table, operandWithAdder);
+        info = R;
         if(!temp){
             temp = getLabelFromTable(table, operand);
             if(temp->attr == EXTERNAL){
-                
+                writeExtFile(temp->name, ic, fileName);
+                info = E;
             }
             else{
                 printf("fallback to external - need to add check");
@@ -155,12 +181,12 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
         }
             
         res = (unsigned int)temp->address;
-        return intToBinary(res, A, ic);
+        return intToBinary(res, info, ic);
     }
     return NULL;
 }
 
-binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* table){
+binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* table, char* fileName){
     char* buffer;
     int i = 0;
     binaryData* temp = (binaryData*)malloc(sizeof(binaryData)), *commandData;
@@ -179,7 +205,7 @@ binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* tab
     while(buffer && strlen(buffer) != 0){
 
         if(table){
-            addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table));
+            addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table, fileName));
         }
         
         /*addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table));*/

@@ -109,7 +109,8 @@ LabelTable* createLabelTable(char* fileName){
                     addToTable(table, generateLabelData(labelSymbol->name, ic, CODE));
                 }      
             }
-            commandToBinary(currSymbol->name, line, &ic, NULL);
+    
+            commandToBinary(currSymbol->name, line, &ic, NULL, fileName);
         }
         else if(currSymbol->type == COMMENT){
         }
@@ -128,6 +129,5 @@ LabelTable* createLabelTable(char* fileName){
         }
     }
     closeFile();
-    printf("icf is %d\n", ic);
     return table;
 }

@@ -73,8 +73,7 @@ void writeBinaryFile(char* fileName, LabelTable* table){
         }
         else if(currSymbol->type == COMMAND){
             isLabel = 0;
-            printf("adding command: %s\n", currSymbol->name);
-            addTwoBinaryLists(commandsLst ,commandToBinary(currSymbol->name, line, &ic, table));
+            addTwoBinaryLists(commandsLst ,commandToBinary(currSymbol->name, line, &ic, table, fileName));
         }
         else if(currSymbol->type == COMMENT){
         }
@@ -84,7 +83,7 @@ void writeBinaryFile(char* fileName, LabelTable* table){
         
     }
 
-    fileBuffer = (char*)malloc(20);
+    fileBuffer = (char*)malloc(31);
     sprintf(fileBuffer, "   %d %d   \n", ic-IC_START, dc);
     writeNextLine(fileBuffer);
     free(fileBuffer);
@@ -100,5 +99,15 @@ void writeBinaryFile(char* fileName, LabelTable* table){
         writeNextLine(fileBuffer);
         free(fileBuffer);
     }
-    printf("icf is %d\n", ic);
+    closeFileWrite();
+    openFileWrite(fileName,".ent");
+    for(i=0;i<table->size;i++){
+        fileBuffer = (char*)malloc(24 + strlen(table->labels[i]->name) + 10);
+        if(table->labels[i]->attr == CODE_AND_ENTRY || table->labels[i]->attr == DATA_AND_ENTRY){
+            sprintf(fileBuffer, "%s %04u \n", table->labels[i]->name, table->labels[i]->address);
+             writeNextLine(fileBuffer);
+        }
+      
+        free(fileBuffer);
+    }
 }
