@@ -32,7 +32,7 @@ void addTwoBinaryLists(binaryList* lst1, binaryList* lst2){
     }
 }
 
-binaryData* intToBinary(unsigned int decimalNumber){
+binaryData* intToBinary(unsigned int decimalNumber, LinkingInfo info, unsigned int pos){
     /*this is the same function i used in mmn11 with minor changes*/
     binaryData* res = (binaryData*)malloc(sizeof(binaryData));
     const short BIT_MASK = 1;
@@ -41,6 +41,8 @@ binaryData* intToBinary(unsigned int decimalNumber){
     {
         res->digits[MAX_DIGITS_BINARY - 1 - i] = (char)(((decimalNumber >> i) & BIT_MASK) + '0');
     }
+    res->info = info;
+    res->pos = pos;
     return res;
 }
 
@@ -61,10 +63,10 @@ binaryList* strLiteralToBinary(char* strLiteral, int* dc){
         return NULL;
     }
     for(i=1;i<size;i++){
-        addToBinaryList(res, intToBinary((int)strLiteral[i]));
+        addToBinaryList(res, intToBinary((int)strLiteral[i], A, *dc));
         (*dc)++;
     }
-    addToBinaryList(res, intToBinary(0));
+    addToBinaryList(res, intToBinary(0,A,*dc));
     (*dc)++;
     return res;
 }
@@ -82,7 +84,7 @@ binaryList* dataLiteralToBinary(char* dataLiteral, int* dc){
             return NULL;
         }
         else{
-            addToBinaryList(res, intToBinary(decimalNumber));
+            addToBinaryList(res, intToBinary(decimalNumber, A, *dc));
         }
         (*dc)++;
         free(buffer);
@@ -113,7 +115,7 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
             printf("unexpected error - incorrect data input format\n");
             return NULL;
         }
-        return intToBinary(decimalNumber);
+        return intToBinary(decimalNumber, A, ic);
         
     }
     else if(num == RELATIVE){
@@ -128,15 +130,16 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
             else{
                 printf("fallback to external - need to add check");
             }
-        if(temp->address - ic + 1 > (1 << (MAX_BINARY_SIZE-1)) - 1 || temp->address - ic + 1 < -1 *(1 << (MAX_BINARY_SIZE-1))){
+        }
+        if(temp->address - (ic) > (1 << (MAX_BINARY_SIZE-1)) - 1 || temp->address - ic + 1 < -1 *(1 << (MAX_BINARY_SIZE-1))){
             printf("jump out of range\n");
             return NULL;
         }
         decimalNumber = temp->address;
-        return intToBinary(decimalNumber - ic + 1);
+        return intToBinary(decimalNumber - (ic), A, ic);
     }
     else if(num == REGISTER_DIRECT){
-        return intToBinary(1 << (int)(operand[1] -'0'));
+        return intToBinary(1 << (int)(operand[1] -'0'), A, ic);
     }
     else if(num == DIRECT){
         operandWithAdder = completeToLabel(operand);
@@ -152,7 +155,7 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
         }
             
         res = (unsigned int)temp->address;
-        return intToBinary(res);
+        return intToBinary(res, A, ic);
     }
     return NULL;
 }
@@ -163,11 +166,13 @@ binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* tab
     binaryData* temp = (binaryData*)malloc(sizeof(binaryData)), *commandData;
     binaryList* res = initBinaryList();
     int operandAddressType[2] = {0,0};
+    temp->info = A;
+    temp->pos = *ic;
     addToBinaryList(res,temp);
-    commandData = intToBinary(getCommandOpcode(command));
+    commandData = intToBinary(getCommandOpcode(command), A, *ic);
     /*command Data is only supposed to reach 4 digits so i need so only it's last 4 digits, and each part of the command has it's own size*/
     strncpy(temp->digits, commandData->digits + MAX_BINARY_SIZE - 4, 4);
-    commandData = intToBinary(getCommandFunct(command));
+    commandData = intToBinary(getCommandFunct(command), A, *ic);
     strncpy(temp->digits + 4, commandData->digits + MAX_BINARY_SIZE - 4, 4);
     buffer = getNextWordParams(&line);
     (*ic)++;
@@ -190,9 +195,9 @@ binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* tab
         operandAddressType[1] = operandAddressType[0];
         operandAddressType[0] = 0;
     }
-    commandData = intToBinary(operandAddressType[0]);
+    commandData = intToBinary(operandAddressType[0], A, *ic);
     strncpy(temp->digits + 8, commandData->digits + MAX_BINARY_SIZE - 2, 2);
-    commandData = intToBinary(operandAddressType[1]);
+    commandData = intToBinary(operandAddressType[1], A, *ic);
     strncpy(temp->digits + 10, commandData->digits + MAX_BINARY_SIZE - 2, 2);
     return res;
 }

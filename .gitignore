@@ -2,3 +2,4 @@
 main
 *.as
 *.am
+*.ob

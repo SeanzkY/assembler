@@ -3,9 +3,9 @@
 #include "../firstPass/firstPass.h"
 
 typedef enum LinkingInfos{
-    A,
-    R,
-    E
+    A='A',
+    R='R',
+    E='E'
 }LinkingInfo;
 
 typedef struct binaryData{

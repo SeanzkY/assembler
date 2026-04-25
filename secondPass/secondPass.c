@@ -4,21 +4,42 @@
 
 #include "./secondPass.h"
 #include "../fileHandle/fileRead.h"
+#include "../fileHandle/fileWrite.h"
 #include "../tokenization/tokenizer.h"
 #include "../tokenization/symbolGenerator.h"
 #include "../CodeGeneration/binaryGenerator.h"
 
 
+char* binaryCommandToHexa(char* bin, unsigned int sizeBin){
+    int maxSizeHexa = sizeBin / 4;
+    char* res = (char*)malloc(sizeof(char)  * (maxSizeHexa+1));
+    int i, temp,j;
+    for(i=0;i<sizeBin;i+=4){
+        temp = 0;
+        for(j=0;j<4;j++){
+            temp += (int)(bin[sizeBin-i-1-j] - '0') << j;
+        }
+        if(temp > 9){
+            res[maxSizeHexa -1 - i / 4] = (temp-10) + 'A';
+        }
+        else{
+            res[maxSizeHexa -1 - i / 4] = temp + '0';
+        }
+    }
+    res[maxSizeHexa] = '\0';
+    return res;
+}
 
 
 void writeBinaryFile(char* fileName, LabelTable* table){
     int i,j;
-    char *line, *lineStart, *buffer, *temp;
+    char *line, *lineStart, *buffer, *temp, *fileBuffer;
     binaryList *commandsLst = initBinaryList(), *dataLst = initBinaryList();
     Symbol* currSymbol;
     LabelData* labelTemp;
     int ic = IC_START, dc = DC_START,  isLabel=0;
     openFile(fileName, ".am");
+    openFileWrite(fileName, ".ob");
     readNextLine(&line);
     while(line){
         lineStart = line;
@@ -62,11 +83,22 @@ void writeBinaryFile(char* fileName, LabelTable* table){
         }
         
     }
+
+    fileBuffer = (char*)malloc(20);
+    sprintf(fileBuffer, "   %d %d   \n", ic-IC_START, dc);
+    writeNextLine(fileBuffer);
+    free(fileBuffer);
     for(i=0;i<commandsLst->size;i++){
-        for(j=0;j<12;j++){
-            printf("%c", commandsLst->bin[i]->digits[j]);
-        }
-        printf("\n");
+        fileBuffer = (char*)malloc(4 + MAX_BINARY_SIZE/4 + 1 + 5);
+        sprintf(fileBuffer, "%04u %s  %c\n", commandsLst->bin[i]->pos, binaryCommandToHexa(commandsLst->bin[i]->digits, MAX_BINARY_SIZE), commandsLst->bin[i]->info);
+        writeNextLine(fileBuffer);
+        free(fileBuffer);
+      }  
+     for(i=0;i<dataLst->size;i++){
+        fileBuffer = (char*)malloc(4 + MAX_BINARY_SIZE/4 + 1 + 5);
+        sprintf(fileBuffer, "%04u %s  %c\n", dataLst->bin[i]->pos + ic, binaryCommandToHexa(dataLst->bin[i]->digits, MAX_BINARY_SIZE), dataLst->bin[i]->info);
+        writeNextLine(fileBuffer);
+        free(fileBuffer);
     }
     printf("icf is %d\n", ic);
 }
