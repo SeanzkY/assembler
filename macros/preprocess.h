@@ -16,6 +16,6 @@ typedef struct MacroList{
 }MacroList;
 
 
-void writeMacroFile(char* fileNameWithoutExtension);
+int writeMacroFile(char* fileNameWithoutExtension);
 
 #endif 

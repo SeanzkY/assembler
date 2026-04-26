@@ -87,7 +87,7 @@ int addMacroToList(MacroList** macroLst, char* line, char* macroName){
 }
 
 
-void writeMacroFile(char* fileNameWithoutExtension){
+int writeMacroFile(char* fileNameWithoutExtension){
     MacroList* macros = NULL;
     MacroList* macrosStart = NULL;
     char* currWord;
@@ -95,8 +95,13 @@ void writeMacroFile(char* fileNameWithoutExtension){
     char* currLine;
     char* currLineStart;
     int success;
-    openFile("code", ".as");
-    openFileWrite("code",".am");
+    if(!openFile(fileNameWithoutExtension, ".as")){
+        return 0;
+    }
+    if(!openFileWrite(fileNameWithoutExtension,".am")){
+        closeFile();
+        return 0;
+    }
     success = readNextLine(&currLine);
     while(currLine){
         currLineStart = currLine;
@@ -131,4 +136,5 @@ void writeMacroFile(char* fileNameWithoutExtension){
     closeFile();
     closeFileWrite();
     freeMacroList(macrosStart);
+    return 1;
 }

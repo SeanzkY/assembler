@@ -20,7 +20,7 @@ int openFile(char* fileNameWithoutExtension, char* extension){
     char* fileName = addExtenstionToName(fileNameWithoutExtension, extension);
     file = fopen(fileName, "r");
     if(!file){
-        printf("file %s is an empty file\n", fileName);
+        printf("file %s doesnt exist\n", fileName);
         return 0;
     }
     return 1;
@@ -33,6 +33,10 @@ void closeFile(){
 }
 
 int getCurrLineCouter(){
+    return lineCounter;
+}
+
+int retLineNum(){
     return lineCounter;
 }
 

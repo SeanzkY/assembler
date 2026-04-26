@@ -55,10 +55,9 @@ LabelTable* createLabelTable(char* fileName){
         buffer = getFirstWord(&line);
         currSymbol = generateSymbol(buffer);
         if(!currSymbol){
-            printf("command: %s doesnt exist\n", buffer);
-            return NULL;
+            printf("command doesnt exist, line: %d command: %s", retLineNum(),lineStart);
         }
-        if(currSymbol->type == LABEL){
+        else if(currSymbol->type == LABEL){
             isLabel = 1;
             labelSymbol = currSymbol;
         }
