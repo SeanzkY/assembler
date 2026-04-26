@@ -43,7 +43,7 @@ LabelData* getLabelFromTable(LabelTable* table, char* labelName){
    
     
 LabelTable* createLabelTable(char* fileName, int* isSuccess){
-    char *line, *lineStart, *buffer;
+    char *line, *lineStart, *buffer, *saveBuffer;
     Symbol* currSymbol, *labelSymbol;
     LabelData* labelTemp;
     LabelTable* table = initTable();
@@ -79,23 +79,43 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                     isLabel = 0;
                     addToTable(table, generateLabelData(labelSymbol->name, dc, DATA));
                 }
-                dataLiteralToBinary(line, &dc);
+                if(!dataLiteralToBinary(line, &dc)){
+                    printf("unexpected error - incorrect data input format, line: %d data: %s",retLineNum(),line);
+                    *isSuccess = 0;
+                }
                 
             }
             else if(strcmp(currSymbol->name, ".extern") == 0){
-                labelTemp = getLabelFromTable(table, currSymbol->name);
+                if(isLabel){
+                    isLabel = 0;
+                }
+                buffer = getFirstWord(&line);
+                labelTemp = getLabelFromTable(table, buffer);
                 if(labelTemp && labelTemp->attr != EXTERNAL){
-                    printf("error label: %s is in the table as external and as not external\n", currSymbol->name);
+                    printf("error label: %s is in the table as external and as not external line: %d\n", currSymbol->name, retLineNum());
+                    *isSuccess = 0;
                 }
                 else{
-                    free(buffer);
-                    buffer = getFirstWord(&line);
                     addToTable(table, generateLabelData(buffer, 0, EXTERNAL));
                 }
                 
+                if(buffer){
+                    saveBuffer = getFirstWord(&line);
+                    if(saveBuffer && strlen(saveBuffer) >= 0)
+                    {
+                        printf("error .ext: external label is not in correct format line: %d data after external: %s \n", retLineNum(), saveBuffer);
+                        *isSuccess = 0;        
+                    }
+                }
+                
+                
             }
             else if(strcmp(currSymbol->name, ".entry") != 0){
-                printf("error in declaration %s is not defined\n", currSymbol->name);
+                 if(isLabel){
+                    isLabel = 0;
+                }
+                printf("error in declaration %s is not defined in line %d\n", currSymbol->name, getCurrLineCouter());
+                *isSuccess = 0;
             }
          
         }
@@ -105,6 +125,7 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                 labelTemp = getLabelFromTable(table, labelSymbol->name);
                 if(labelTemp){
                     printf("error label: %s\n is in the table as external and as not external\n", labelTemp->name);
+                    *isSuccess = 0;
                     free(labelTemp);
                 }
                 else{
@@ -119,6 +140,7 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
         }
         else{
             printf("inexistent command found: %s\n", currSymbol->name);
+            *isSuccess = 0;
         }
         if(!isLabel){
             free(buffer);

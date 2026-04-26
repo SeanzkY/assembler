@@ -15,9 +15,17 @@ void skipSpaces(char** wordStart){
 }
 
 void trimEndSpaces(char** wordStart){
+    char* start;
+    int firstSpacePos;
     if(strchr(*wordStart, ' ')){
-        int firstSpacePos = strchr(*wordStart, ' ') - *wordStart;
-        (*wordStart)[firstSpacePos] = '\0';
+        start = strchr(*wordStart, ' ');
+        while(*start && *start == ' '){
+            start++;
+        }
+        if(*start == '\0'){
+             firstSpacePos = strchr(*wordStart, ' ') - *wordStart;
+            (*wordStart)[firstSpacePos] = '\0';
+        }
     }
     
     
@@ -71,6 +79,7 @@ char* getNextWordParams(char** wordStart){
     }
     res = strCopyWord(*wordStart, currStr-1);
     trimEndSpaces(&res);
+
     *wordStart = (currStr+1);
     return res;
 }

@@ -59,8 +59,13 @@ char* completeToLabel(char* reference){
 binaryList* strLiteralToBinary(char* strLiteral, int* dc){
     binaryList* res = initBinaryList();
     int size, i;
+    char* temp;
     strLiteral = getNextWordStrLiteral(&strLiteral);
     if(!strLiteral){
+        return NULL;
+    }
+    temp = getFirstWord(&strLiteral);
+    if(temp){
         return NULL;
     }
     size =  strlen(strLiteral) - 1;
@@ -97,23 +102,28 @@ int isValidNumericString(char* number){
    
 }
 
+
+
 binaryList* dataLiteralToBinary(char* dataLiteral, int* dc){
     char *buffer;
     int decimalNumber;
     binaryList* res = initBinaryList();
     buffer = getNextWordParams(&dataLiteral);
-        while(buffer && strlen(buffer) != 0){
+    while(buffer && strlen(buffer) != 0){
         if(sscanf(buffer, "%d", &decimalNumber) != 1 || !isValidNumericString(buffer)) 
         {   
-            printf("unexpected error - incorrect data input format\n");
             return NULL;
         }
         else{
             addToBinaryList(res, intToBinary(decimalNumber, A, *dc));
         }
         (*dc)++;
+       
         free(buffer);
         buffer = getNextWordParams(&dataLiteral);
+    }
+    if(buffer){
+        return NULL;
     }
     return res;
 }
