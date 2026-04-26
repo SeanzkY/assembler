@@ -101,7 +101,7 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                 
                 if(buffer){
                     saveBuffer = getFirstWord(&line);
-                    if(saveBuffer && strlen(saveBuffer) >= 0)
+                    if(saveBuffer && strlen(saveBuffer) > 0)
                     {
                         printf("error .ext: external label is not in correct format line: %d data after external: %s \n", retLineNum(), saveBuffer);
                         *isSuccess = 0;        
@@ -116,6 +116,22 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                 }
                 printf("error in declaration %s is not defined in line %d\n", currSymbol->name, getCurrLineCouter());
                 *isSuccess = 0;
+            }
+            else{
+                buffer = getFirstWord(&line);
+                if(buffer){
+                    saveBuffer = getFirstWord(&line);
+                    if(saveBuffer && strlen(saveBuffer) > 0)
+                    {
+                        printf("error .ent: entry label is not in correct format line: %d data after entry: %s \n", retLineNum(), saveBuffer);
+                        *isSuccess = 0;        
+                    }
+                }
+                else{
+                    printf("error .ent: entry label is not in correct format line: %d data missing: %s \n", retLineNum(), lineStart);
+                    *isSuccess = 0;     
+                }
+                    
             }
          
         }
@@ -132,7 +148,7 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                     addToTable(table, generateLabelData(labelSymbol->name, ic, CODE));
                 }      
             }
-    
+            
             commandToBinary(currSymbol->name, line, &ic, NULL, fileName, 0);
         }
         else if(currSymbol->type == COMMENT){

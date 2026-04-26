@@ -1,3 +1,6 @@
+#ifndef commandsheader
+#define commandsheader
+
 typedef enum AddressType{
     IMMEDIATE,
     DIRECT,
@@ -20,3 +23,5 @@ typedef struct CommandData{
     AddressType src[4];
     AddressType dst[4];
 }CommandData;
+
+#endif

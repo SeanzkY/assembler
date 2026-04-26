@@ -1,3 +1,7 @@
+
+#include "commands.h"
+
+
 typedef enum SymbolType {
     LABEL,
     DECLARATION,
@@ -19,6 +23,12 @@ int getCommandFunct(char* command);
 
 int getCommandOpcode(char* command);
 
+int getCommandParamNumber(char* command);
+
+int isCommandAllowedAddress(char* command, AddressType addr, int isSrc);
+
 Symbol* generateSymbol(char* token);
 
 int isNumeric(char c);
+
+#

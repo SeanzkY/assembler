@@ -4,6 +4,7 @@
 #include "../tokenization/commands.h"
 #include "../firstPass/firstPass.h"
 #include "../fileHandle/fileWrite.h"
+#include "../fileHandle/fileRead.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -221,6 +222,7 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
 
 binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* table, char* fileName, int checkErrors){
     char* buffer;
+    int commandParamNum = getCommandParamNumber(command);
     int i = 0;
     binaryData* temp = (binaryData*)malloc(sizeof(binaryData)), *commandData;
     binaryList* res = initBinaryList();
@@ -236,8 +238,24 @@ binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* tab
     buffer = getNextWordParams(&line);
     (*ic)++;
     while(buffer && strlen(buffer) != 0){
-
+        if(commandParamNum <= 0 || i == 2){
+            if(checkErrors)
+                printf("error in command %s line %d , got too many parameters\n", command,getCurrLineCouter());
+            return NULL;
+        }
+        commandParamNum -= 1;
         if(checkErrors){
+            if(getCommandParamNumber(command) == 1){
+                 if(!isCommandAllowedAddress(command, getAddressType(buffer), 0)){
+                    printf("error in command %s  line %d, parameters mismatch command\n", command ,getCurrLineCouter());
+                }
+            }
+            else{
+                if(!isCommandAllowedAddress(command, getAddressType(buffer), i == 0 ? 1 : 0)){
+                    printf("error in command %s  line %d, parameters mismatch command\n", command ,getCurrLineCouter());
+                }
+            }
+                
             addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table, fileName));
         }
         
@@ -248,7 +266,14 @@ binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* tab
         buffer = getNextWordParams(&line);
         
         i++;
-        
+    }
+    if(buffer && strlen(buffer) == 0 && getCommandParamNumber(command) != 0 && checkErrors){
+        printf("error in command %s line %d, incorrect format\n", command,getCurrLineCouter());
+        return NULL;
+    }
+    if(checkErrors && commandParamNum > 0){
+        printf("error in command %s line %d, not enough parameters\n", command, getCurrLineCouter());
+        return NULL;
     }
     if(i==1){
         operandAddressType[1] = operandAddressType[0];

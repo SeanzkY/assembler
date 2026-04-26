@@ -31,6 +31,8 @@ CommandData commands[16] = {
     {"stop", 0 , 15, EMPTY_ADDRS_LST, EMPTY_ADDRS_LST }
 };
 
+
+
 CommandData* getCommandData(char* command){
     int i;
     CommandData* res;
@@ -44,6 +46,35 @@ CommandData* getCommandData(char* command){
     return NULL;
 }
 
+int isCommandAllowedAddress(char* command, AddressType addr, int isSrc){
+    int i;
+    AddressType* cmp;
+    CommandData* res = getCommandData(command);
+    if(isSrc)
+        cmp = res->src;
+    else
+        cmp = res->dst;
+
+    for(i=0;i<4;i++){
+        if(cmp[i] == addr)
+            return 1;
+    }
+    free(res);
+    return 0;
+}
+
+int getCommandParamNumber(char* command){
+    int i = 0;
+    CommandData* res = getCommandData(command);
+    AddressType* src = res->src;
+    AddressType* dst = res->dst;
+    free(res);
+    if(src[0] != EMPTY_ADDRESS)
+        i++;
+    if(dst[0] != EMPTY_ADDRESS)
+        i++;
+    return i;
+}
 
 int getCommandFunct(char* command){
     CommandData* res = getCommandData(command);
