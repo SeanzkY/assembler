@@ -1,4 +1,4 @@
 #include "../firstPass/firstPass.h"
 
 
-void writeBinaryFile(char* fileName, LabelTable* table);
+void writeBinaryFile(char* fileName, LabelTable* table, int genFile);

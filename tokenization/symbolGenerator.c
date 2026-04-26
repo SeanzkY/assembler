@@ -10,7 +10,7 @@
 #define ADDRESS_TYPE_2  {DIRECT,EMPTY_ADDRESS,EMPTY_ADDRESS,EMPTY_ADDRESS}
 #define ADDRESS_TYPE_3 {DIRECT, REGISTER_DIRECT, EMPTY_ADDRESS, EMPTY_ADDRESS}
 #define ADDRESS_TYPE_4 {DIRECT, RELATIVE, EMPTY_ADDRESS, EMPTY_ADDRESS}
-
+#define MAX_LABEL_SIZE 31
 
 CommandData commands[16] = {
     {"mov", 0 , 0, ADDRESS_TYPE_1, ADDRESS_TYPE_3},
@@ -75,9 +75,29 @@ Symbol* isCommand(char* token){
     return NULL;
 }
 
+int isAlpha(char c){
+    return ((c <= 'z' && c >= 'a')  || (c <= 'Z' && c >= 'A'));
+}
+
+int isNumeric(char c){
+    return (c <= '9' && c >= '0');
+}
+
 Symbol* isLabel(char* token){
-    if(token && token[strlen(token) - 1] == ':')
+    int i;
+    if(token && token[strlen(token) - 1] == ':' && strlen(token) <= MAX_LABEL_SIZE){
+        if(!isAlpha(token[0])){
+            return NULL;
+
+        }
+        for(i=1;i<strlen(token)-1;i++){
+             if(!isAlpha(token[i]) && !isNumeric(token[i])){
+                return NULL;
+
+             }
+        }
         return allocateSymbol(token, LABEL);
+    }
     return NULL;
 }
 
@@ -88,7 +108,7 @@ Symbol* isDeclaration(char* token){
 }
 
 Symbol* isComment(char* token){
-    if(token && token[strlen(token) - 1] == ';')
+    if(token && token[0] == ';')
         return allocateSymbol(token, COMMENT);
     return NULL;
 }

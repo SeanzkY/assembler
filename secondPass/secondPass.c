@@ -31,7 +31,7 @@ char* binaryCommandToHexa(char* bin, unsigned int sizeBin){
 }
 
 
-void writeBinaryFile(char* fileName, LabelTable* table){
+void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
     int i,j;
     char *line, *lineStart, *buffer, *temp, *fileBuffer;
     binaryList *commandsLst = initBinaryList(), *dataLst = initBinaryList();
@@ -39,13 +39,18 @@ void writeBinaryFile(char* fileName, LabelTable* table){
     LabelData* labelTemp;
     int ic = IC_START, dc = DC_START,  isLabel=0;
     openFile(fileName, ".am");
-    openFileWrite(fileName, ".ob");
+    if(genFile)
+        openFileWrite(fileName, ".ob");
     readNextLine(&line);
     while(line){
+        /*printf("curr command is %s", line);*/
         lineStart = line;
         buffer = getFirstWord(&line);
         currSymbol = generateSymbol(buffer);
-        if(currSymbol->type == LABEL){
+        if(!currSymbol){
+            
+        }
+        else if(currSymbol->type == LABEL){
             isLabel = 1;
         }
         else if(currSymbol->type == DECLARATION){
@@ -61,21 +66,28 @@ void writeBinaryFile(char* fileName, LabelTable* table){
                 buffer = getFirstWord(&line);
                 temp = completeToLabel(buffer);
                 labelTemp =  getLabelFromTable(table, temp);
-                if(labelTemp->attr == CODE)
-                    labelTemp->attr = CODE_AND_ENTRY;
-                else if(labelTemp->attr == DATA)
-                    labelTemp->attr = DATA_AND_ENTRY;
-                else{
-                    printf("error in entry label: %s\n", buffer);
+                if(!labelTemp){
+                    printf("entry: %s doesn't exist in file, line: %d\n", buffer, getCurrLineCouter());
                 }
+                else{
+                    if(labelTemp->attr == CODE)
+                    labelTemp->attr = CODE_AND_ENTRY;
+                    else if(labelTemp->attr == DATA)
+                        labelTemp->attr = DATA_AND_ENTRY;
+                    else{
+                    printf("entry: %s doesn't exist in file in correct way, line: %d\n", buffer, getCurrLineCouter());
+                    }
+                }
+                
                 
             }
         }
         else if(currSymbol->type == COMMAND){
             isLabel = 0;
-            addTwoBinaryLists(commandsLst ,commandToBinary(currSymbol->name, line, &ic, table, fileName));
+            addTwoBinaryLists(commandsLst ,commandToBinary(currSymbol->name, line, &ic, table, fileName, 1));
         }
         else if(currSymbol->type == COMMENT){
+             isLabel = 0;
         }
         if(!isLabel){
             readNextLine(&line);

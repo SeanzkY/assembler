@@ -20,3 +20,5 @@ int getCommandFunct(char* command);
 int getCommandOpcode(char* command);
 
 Symbol* generateSymbol(char* token);
+
+int isNumeric(char c);

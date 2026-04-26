@@ -34,6 +34,6 @@ typedef struct LabelTable{
 
 LabelData* getLabelFromTable(LabelTable* table, char* labelName);
 
-LabelTable* createLabelTable(char* fileName);
+LabelTable* createLabelTable(char* fileName, int* isSuccess);
 
 #endif 

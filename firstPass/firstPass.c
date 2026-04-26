@@ -42,7 +42,7 @@ LabelData* getLabelFromTable(LabelTable* table, char* labelName){
 }
    
     
-LabelTable* createLabelTable(char* fileName){
+LabelTable* createLabelTable(char* fileName, int* isSuccess){
     char *line, *lineStart, *buffer;
     Symbol* currSymbol, *labelSymbol;
     LabelData* labelTemp;
@@ -51,11 +51,13 @@ LabelTable* createLabelTable(char* fileName){
     openFile(fileName, ".am");
     readNextLine(&line);
     while(line){
+        /*printf("curr command is %s", lineStart);*/
         lineStart = line;
         buffer = getFirstWord(&line);
         currSymbol = generateSymbol(buffer);
         if(!currSymbol){
             printf("command doesnt exist, line: %d command: %s", retLineNum(),lineStart);
+            *isSuccess = 0;
         }
         else if(currSymbol->type == LABEL){
             isLabel = 1;
@@ -67,7 +69,10 @@ LabelTable* createLabelTable(char* fileName){
                     isLabel = 0;
                     addToTable(table, generateLabelData(labelSymbol->name, dc, DATA));
                 }
-                strLiteralToBinary(line, &dc);
+                if(!strLiteralToBinary(line, &dc)){
+                    printf("unexpected error - incorrect string input format, line: %d string: %s",retLineNum(),line);
+                    *isSuccess = 0;
+                }
             }
             else if(strcmp(currSymbol->name, ".data") == 0){
                 if(isLabel){
@@ -107,9 +112,10 @@ LabelTable* createLabelTable(char* fileName){
                 }      
             }
     
-            commandToBinary(currSymbol->name, line, &ic, NULL, fileName);
+            commandToBinary(currSymbol->name, line, &ic, NULL, fileName, 0);
         }
         else if(currSymbol->type == COMMENT){
+            isLabel = 0;
         }
         else{
             printf("inexistent command found: %s\n", currSymbol->name);

@@ -60,10 +60,17 @@ binaryList* strLiteralToBinary(char* strLiteral, int* dc){
     binaryList* res = initBinaryList();
     int size, i;
     strLiteral = getNextWordStrLiteral(&strLiteral);
-    size =  strlen(strLiteral) - 1;
-    if(strLiteral[0] != strLiteral[size] || strLiteral[0] != '\"'){
-        printf("unexpected error - incorrect string input format\n");
+    if(!strLiteral){
         return NULL;
+    }
+    size =  strlen(strLiteral) - 1;
+ 
+    if(strLiteral[0] != strLiteral[size] || strLiteral[0] != '\"'){
+        return NULL;
+    }
+    for(i=1;i<size;i++){
+        if((int)strLiteral[i] < 0 || (int)strLiteral[i] > 127)
+            return NULL;
     }
     for(i=1;i<size;i++){
         addToBinaryList(res, intToBinary((int)strLiteral[i], A, *dc));
@@ -74,13 +81,29 @@ binaryList* strLiteralToBinary(char* strLiteral, int* dc){
     return res;
 }
 
+int isValidNumericString(char* number){
+    int i,start=0;
+    if(!number)
+        return 0;
+    if(number[0] == '-' || number[0] == '+')
+        start=1;
+    if(strlen(number) - start <= 0)
+        return 0;
+    for(i=start;i<strlen(number);i++){
+        if(!isNumeric(number[i]))
+            return 0;
+    }
+    return 1;
+   
+}
+
 binaryList* dataLiteralToBinary(char* dataLiteral, int* dc){
     char *buffer;
     int decimalNumber;
     binaryList* res = initBinaryList();
     buffer = getNextWordParams(&dataLiteral);
         while(buffer && strlen(buffer) != 0){
-        if(sscanf(buffer, "%d", &decimalNumber) != 1) 
+        if(sscanf(buffer, "%d", &decimalNumber) != 1 || !isValidNumericString(buffer)) 
         {   
             printf("unexpected error - incorrect data input format\n");
             return NULL;
@@ -186,7 +209,7 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
     return NULL;
 }
 
-binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* table, char* fileName){
+binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* table, char* fileName, int checkErrors){
     char* buffer;
     int i = 0;
     binaryData* temp = (binaryData*)malloc(sizeof(binaryData)), *commandData;
@@ -204,7 +227,7 @@ binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* tab
     (*ic)++;
     while(buffer && strlen(buffer) != 0){
 
-        if(table){
+        if(checkErrors){
             addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table, fileName));
         }
         

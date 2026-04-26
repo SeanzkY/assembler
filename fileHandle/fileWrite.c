@@ -26,13 +26,16 @@ int openFileWrite(char* fileNameWithoutExtension, char* extension){
 
 
 void closeFileWrite(){
-    fclose(fileWrite);
+    if(fileWrite)
+        fclose(fileWrite);
     fileWrite = NULL;
 }
 
 
 int writeNextLine(char* buffer){
-    int res;
-    res = fputs(buffer, fileWrite);
-    return res;
+    if(fileWrite){
+        int res;
+        res = fputs(buffer, fileWrite);
+        return res;
+    }
 }
