@@ -36,4 +36,6 @@ LabelData* getLabelFromTable(LabelTable* table, char* labelName);
 
 LabelTable* createLabelTable(char* fileName, int* isSuccess);
 
+void freeLabelTable(LabelTable* table);
+
 #endif 

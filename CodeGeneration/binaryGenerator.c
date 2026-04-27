@@ -174,9 +174,11 @@ int writeExtFile(char* label, int pos){
 /*puts all the data written when use writeExtFile into the ext file*/
 int commitExtFile(char* fileName){
     int res = 1, i;
+    char* fullFileName;
     if(!extFile){
-        char* fullFileName = addExtenstionToName(fileName, ".ext");
+        fullFileName = addExtenstionToName(fileName, ".ext");
         extFile = fopen(fullFileName, "w");
+        free(fullFileName);
     }
     for(i=0;i<extFileSize;i++){
         res = fputs(extFileData[i], extFile) && res;
@@ -187,12 +189,17 @@ int commitExtFile(char* fileName){
 
 /*closes the ext file*/
 void closeExtFile(){
+    int i;
     if(extFile){
         fclose(extFile);
-        extFileSize = 0;
-        extFileData = NULL;
         extFile = NULL;
     }
+    for(i=0;i<extFileSize;i++){
+        free(extFileData[i]);
+    }
+    free(extFileData);
+    extFileData = NULL;
+    extFileSize = 0;
 }
 
 /*translate operand to binary struct
@@ -215,6 +222,7 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
     else if(num == RELATIVE){
         operandWithAdder = completeToLabel(operand);
         temp = getLabelFromTable(table, operandWithAdder+1);
+        free(operandWithAdder);
         if(!temp){
             temp = getLabelFromTable(table, operand+1);
             if(temp && temp->attr == EXTERNAL){
@@ -239,6 +247,7 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
     else if(num == DIRECT){
         operandWithAdder = completeToLabel(operand);
         temp = getLabelFromTable(table, operandWithAdder);
+        free(operandWithAdder);
         info = R;
         if(!temp){
             temp = getLabelFromTable(table, operand);

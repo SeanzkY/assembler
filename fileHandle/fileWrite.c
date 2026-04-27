@@ -15,8 +15,10 @@ int openFileWrite(char* fileNameWithoutExtension, char* extension){
     fileWrite = fopen(fileName, "w");
     if(!fileWrite){
         printf("error in creating file: %s \n", fileName);
+        free(fileName);
         return 0;
     }
+    free(fileName);
     return 1;
 }
 
@@ -34,4 +36,5 @@ int writeNextLine(char* buffer){
         res = fputs(buffer, fileWrite);
         return res;
     }
+    return 0;
 }

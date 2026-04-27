@@ -35,8 +35,8 @@ genFile meaning if need to generate file or not if
 there was an error or we dont have entire table now
 it writes the entire hexa code to file and the ext file */
 void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
-    int i,j;
-    char *line, *lineStart, *buffer, *temp, *fileBuffer;
+    int i;
+    char *line, *buffer, *temp, *fileBuffer;
     binaryList *commandsLst = initBinaryList(), *dataLst = initBinaryList(), *tempList;
     Symbol* currSymbol;
     LabelData* labelTemp;
@@ -44,7 +44,6 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
     openFile(fileName, ".am");
     readNextLine(&line);
     while(line){
-        lineStart = line;
         buffer = getFirstWord(&line);
         currSymbol = generateSymbol(buffer);
         if(!currSymbol){
@@ -67,6 +66,7 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
                 buffer = getFirstWord(&line);
                 temp = completeToLabel(buffer);
                 labelTemp =  getLabelFromTable(table, temp);
+                free(temp);
                 if(!labelTemp){
                     printf("entry: %s doesn't exist in file, line: %d\n", buffer, getCurrLineCouter());
                     genFile = 0;
@@ -81,6 +81,7 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
                         genFile = 0;
                     }
                 }
+                free(buffer);
                 
                 
             }
@@ -113,14 +114,18 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
     free(fileBuffer);
     /*write data and code files*/
     for(i=0;i<commandsLst->size;i++){
+        char* hexa = binaryCommandToHexa(commandsLst->bin[i]->digits, MAX_BINARY_SIZE);
         fileBuffer = (char*)malloc(4 + MAX_BINARY_SIZE/4 + 1 + 5);
-        sprintf(fileBuffer, "%04u %s  %c\n", commandsLst->bin[i]->pos, binaryCommandToHexa(commandsLst->bin[i]->digits, MAX_BINARY_SIZE), commandsLst->bin[i]->info);
+        sprintf(fileBuffer, "%04u %s  %c\n", commandsLst->bin[i]->pos, hexa, commandsLst->bin[i]->info);
+        free(hexa);
         writeNextLine(fileBuffer);
         free(fileBuffer);
       }  
      for(i=0;i<dataLst->size;i++){
+        char* hexa = binaryCommandToHexa(dataLst->bin[i]->digits, MAX_BINARY_SIZE);
         fileBuffer = (char*)malloc(4 + MAX_BINARY_SIZE/4 + 1 + 5);
-        sprintf(fileBuffer, "%04u %s  %c\n", dataLst->bin[i]->pos + ic, binaryCommandToHexa(dataLst->bin[i]->digits, MAX_BINARY_SIZE), dataLst->bin[i]->info);
+        sprintf(fileBuffer, "%04u %s  %c\n", dataLst->bin[i]->pos + ic, hexa, dataLst->bin[i]->info);
+        free(hexa);
         writeNextLine(fileBuffer);
         free(fileBuffer);
     }
@@ -138,8 +143,11 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
             temp[strlen(table->labels[i]->name) - 1] = '\0';
             sprintf(fileBuffer, "%s %04u \n", temp, table->labels[i]->address);
             writeNextLine(fileBuffer);
+            free(temp);
         }
-      
+        else{
+            fileBuffer[0] = '\0';
+        }
         free(fileBuffer);
     }
 }

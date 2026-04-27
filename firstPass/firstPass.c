@@ -189,3 +189,14 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
     closeFile();
     return table;
 }
+
+void freeLabelTable(LabelTable* table){
+    int i;
+    if(!table) return;
+    for(i=0;i<table->size;i++){
+        free(table->labels[i]->name);
+        free(table->labels[i]);
+    }
+    free(table->labels);
+    free(table);
+}
