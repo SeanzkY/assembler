@@ -9,6 +9,7 @@
 FILE* file = NULL;
 int lineCounter = 0;
 
+/*add extension to file name*/
 char* addExtenstionToName(char* fileNameWithoutExtension, char* extension){
     char* fileName = (char*)malloc(strlen((fileNameWithoutExtension) + strlen(extension) + 1) * sizeof(char) );
     strcpy(fileName,fileNameWithoutExtension);
@@ -16,6 +17,7 @@ char* addExtenstionToName(char* fileNameWithoutExtension, char* extension){
     return fileName;
 }
 
+/*open file for reading*/
 int openFile(char* fileNameWithoutExtension, char* extension){
     char* fileName = addExtenstionToName(fileNameWithoutExtension, extension);
     file = fopen(fileName, "r");
@@ -26,20 +28,22 @@ int openFile(char* fileNameWithoutExtension, char* extension){
     return 1;
 }
 
+/*close file for reading*/
 void closeFile(){
     fclose(file);
     file = NULL;
     lineCounter = 0;
 }
 
+/*gets curr line read*/
 int getCurrLineCouter(){
     return lineCounter;
 }
 
-int retLineNum(){
-    return lineCounter;
-}
 
+
+/*read next line from file - put it in buffer and return 
+if succeeded and line follows limit*/
 int readNextLine(char** buffer){
     int res;
     lineCounter++;

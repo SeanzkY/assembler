@@ -1,5 +1,5 @@
 
-
+char* addExtenstionToName(char* fileNameWithoutExtension, char* extension);
 
 int getCurrLineCouter();
 

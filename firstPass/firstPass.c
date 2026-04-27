@@ -8,6 +8,7 @@
 #include "../tokenization/symbolGenerator.h"
 #include "../CodeGeneration/binaryGenerator.h"
 
+/*return allocated sturct of labelData*/
 LabelData* generateLabelData(char* name,  int address, LabelType attr){
     LabelData* res = (LabelData*)malloc(sizeof(LabelData));
     res->name = (char*)malloc((strlen(name) + 1) * sizeof(char));
@@ -17,6 +18,7 @@ LabelData* generateLabelData(char* name,  int address, LabelType attr){
     return res;
 }
 
+/*init the label table*/
 LabelTable* initTable(){
     LabelTable* res = (LabelTable*)malloc(sizeof(LabelTable));
     res->labels = NULL;
@@ -24,6 +26,7 @@ LabelTable* initTable(){
     return res;
 }
 
+/*add value to table*/
 LabelTable* addToTable(LabelTable* table, LabelData* data){
     table->size += 1;
     table->labels = (LabelData**)(realloc(table->labels ,sizeof(LabelData*) * table->size));
@@ -31,6 +34,7 @@ LabelTable* addToTable(LabelTable* table, LabelData* data){
     return table;
 }
 
+/*return allocated label struct from label*/
 LabelData* getLabelFromTable(LabelTable* table, char* labelName){
     int i;   
     for(i=0;i<table->size;i++){
@@ -41,7 +45,10 @@ LabelData* getLabelFromTable(LabelTable* table, char* labelName){
     return NULL;
 }
    
-    
+
+/*this is the first pass function it returns
+a label table with all the tables and data as needed
+isSuccess returns if it found any errors or not */
 LabelTable* createLabelTable(char* fileName, int* isSuccess){
     char *line, *lineStart, *buffer, *saveBuffer;
     Symbol* currSymbol, *labelSymbol;
@@ -65,7 +72,7 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
         buffer = getFirstWord(&line);
         currSymbol = generateSymbol(buffer);
         if(!currSymbol){
-            printf("command doesnt exist, line: %d command: %s\n", retLineNum(),lineStart);
+            printf("command doesnt exist, line: %d command: %s\n", getCurrLineCouter(),lineStart);
             *isSuccess = 0;
         }
         else if(currSymbol->type == LABEL){
@@ -79,7 +86,7 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                     addToTable(table, generateLabelData(labelSymbol->name, dc, DATA));
                 }
                 if(!strLiteralToBinary(line, &dc)){
-                    printf("unexpected error - incorrect string input format, line: %d string: %s",retLineNum(),line);
+                    printf("unexpected error - incorrect string input format, line: %d string: %s",getCurrLineCouter(),line);
                     *isSuccess = 0;
                 }
             }
@@ -89,7 +96,7 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                     addToTable(table, generateLabelData(labelSymbol->name, dc, DATA));
                 }
                 if(!dataLiteralToBinary(line, &dc)){
-                    printf("unexpected error - incorrect data input format, line: %d data: %s",retLineNum(),line);
+                    printf("unexpected error - incorrect data input format, line: %d data: %s",getCurrLineCouter(),line);
                     *isSuccess = 0;
                 }
                 
@@ -101,7 +108,7 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                 buffer = getFirstWord(&line);
                 labelTemp = getLabelFromTable(table, buffer);
                 if(labelTemp && labelTemp->attr != EXTERNAL){
-                    printf("error label: %s is in the table as external and as not external line: %d\n", currSymbol->name, retLineNum());
+                    printf("error label: %s is in the table as external and as not external line: %d\n", currSymbol->name, getCurrLineCouter());
                     *isSuccess = 0;
                 }
                 else{
@@ -112,7 +119,7 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                     saveBuffer = getFirstWord(&line);
                     if(saveBuffer && strlen(saveBuffer) > 0)
                     {
-                        printf("error .ext: external label is not in correct format line: %d data after external: %s \n", retLineNum(), saveBuffer);
+                        printf("error .ext: external label is not in correct format line: %d data after external: %s \n", getCurrLineCouter(), saveBuffer);
                         *isSuccess = 0;        
                     }
                 }
@@ -133,12 +140,12 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                     saveBuffer = getFirstWord(&line);
                     if(saveBuffer && strlen(saveBuffer) > 0)
                     {
-                        printf("error .ent: entry label is not in correct format line: %d data after entry: %s \n", retLineNum(), saveBuffer);
+                        printf("error .ent: entry label is not in correct format line: %d data after entry: %s \n", getCurrLineCouter(), saveBuffer);
                         *isSuccess = 0;        
                     }
                 }
                 else{
-                    printf("error .ent: entry label is not in correct format line: %d data missing: %s \n", retLineNum(), lineStart);
+                    printf("error .ent: entry label is not in correct format line: %d data missing: %s \n", getCurrLineCouter(), lineStart);
                     *isSuccess = 0;     
                 }
                     

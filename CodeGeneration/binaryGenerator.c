@@ -17,13 +17,14 @@ int extFileSize = 0;
 char** extFileData = NULL;
 
 
+/*init binary list - list of binary commands*/
 binaryList* initBinaryList(){
     binaryList* res = (binaryList*)malloc(sizeof(binaryList));
     res->size = 0;
     res->bin = NULL;
     return res;
 }
-
+/*add binary data to list*/
 void addToBinaryList(binaryList* lst, binaryData* data){
     if(data){
         lst->bin = (binaryData**)realloc(lst->bin, sizeof(binaryData*) * (lst->size+1));
@@ -33,6 +34,7 @@ void addToBinaryList(binaryList* lst, binaryData* data){
   
 }
 
+/*combine two binary lists*/
 void addTwoBinaryLists(binaryList* lst1, binaryList* lst2){
     int i;
     if(!lst2 || !lst1)
@@ -42,6 +44,7 @@ void addTwoBinaryLists(binaryList* lst1, binaryList* lst2){
     }
 }
 
+/*gets int and info about linking - return binary data*/
 binaryData* intToBinary(unsigned int decimalNumber, LinkingInfo info, unsigned int pos){
     /*this is the same function i used in mmn11 with minor changes*/
     binaryData* res = (binaryData*)malloc(sizeof(binaryData));
@@ -56,6 +59,8 @@ binaryData* intToBinary(unsigned int decimalNumber, LinkingInfo info, unsigned i
     return res;
 }
 
+/*add : to the end - because external labels are saved with
+: at the end*/
 char* completeToLabel(char* reference){
     char* res = (char*)malloc((strlen(reference)+2) * sizeof(char));
     strcpy(res, reference);
@@ -63,6 +68,7 @@ char* completeToLabel(char* reference){
     return res;
 }
 
+/*translate strLiteral to binary - add to dc the amount needed*/
 binaryList* strLiteralToBinary(char* strLiteral, int* dc){
     binaryList* res = initBinaryList();
     int size, i;
@@ -94,6 +100,7 @@ binaryList* strLiteralToBinary(char* strLiteral, int* dc){
     return res;
 }
 
+/*check if data is a valid string start with - or + followed by numbers*/
 int isValidNumericString(char* number){
     int i,start=0;
     if(!number)
@@ -111,7 +118,8 @@ int isValidNumericString(char* number){
 }
 
 
-
+/*turns data literal to binary - for after .data
+also increase dc by amount needed*/
 binaryList* dataLiteralToBinary(char* dataLiteral, int* dc){
     char *buffer;
     int decimalNumber;
@@ -136,6 +144,7 @@ binaryList* dataLiteralToBinary(char* dataLiteral, int* dc){
     return res;
 }
 
+/*gets operand and returns its address type*/
 AddressType getAddressType(char* operand){
     if(operand[0] == '#')
         return IMMEDIATE;
@@ -147,7 +156,10 @@ AddressType getAddressType(char* operand){
         return DIRECT;
 }
 
-
+/*add one line to ext file
+but doesnt do it only after
+function commitExtFile is called 
+if there is no need to add because program failed after*/
 int writeExtFile(char* label, int pos){
     
     char* buffer = (char*)malloc(24 + strlen(label) + 10);
@@ -159,10 +171,11 @@ int writeExtFile(char* label, int pos){
 
 }
 
+/*puts all the data written when use writeExtFile into the ext file*/
 int commitExtFile(char* fileName){
     int res = 1, i;
     if(!extFile){
-        char* fullFileName = addExtenstionToNameWrite(fileName, ".ext");
+        char* fullFileName = addExtenstionToName(fileName, ".ext");
         extFile = fopen(fullFileName, "w");
     }
     for(i=0;i<extFileSize;i++){
@@ -172,6 +185,7 @@ int commitExtFile(char* fileName){
     return res;
 }
 
+/*closes the ext file*/
 void closeExtFile(){
     if(extFile){
         fclose(extFile);
@@ -181,6 +195,8 @@ void closeExtFile(){
     }
 }
 
+/*translate operand to binary struct
+uses the label table and writes to ext file if needed*/
 binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable* table, char* fileName){
     int decimalNumber;
     unsigned int res;

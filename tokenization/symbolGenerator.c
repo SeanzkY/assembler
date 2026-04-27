@@ -33,6 +33,8 @@ CommandData commands[16] = {
 
 
 
+/*get command and return its object if it exist
+if not then return null  */
 CommandData* getCommandData(char* command){
     int i;
     CommandData* res;
@@ -46,6 +48,9 @@ CommandData* getCommandData(char* command){
     return NULL;
 }
 
+/* get command in str and its address type and if to 
+check the source operand or dst operand - return if
+its allowed from the object we created at start */
 int isCommandAllowedAddress(char* command, AddressType addr, int isSrc){
     int i;
     AddressType* cmp;
@@ -63,6 +68,8 @@ int isCommandAllowedAddress(char* command, AddressType addr, int isSrc){
     return 0;
 }
 
+/* get command str and returns its number
+of operands that it needs to have */
 int getCommandParamNumber(char* command){
     int i = 0;
     CommandData* res = getCommandData(command);
@@ -76,6 +83,7 @@ int getCommandParamNumber(char* command){
     return i;
 }
 
+/* get funct value of command */
 int getCommandFunct(char* command){
     CommandData* res = getCommandData(command);
     int funct = res->funct;
@@ -83,6 +91,7 @@ int getCommandFunct(char* command){
     return funct;
 }
 
+/* get opcode value of command */
 int getCommandOpcode(char* command){
     CommandData* res = getCommandData(command);
     int opCode = res->opCode;
@@ -90,6 +99,7 @@ int getCommandOpcode(char* command){
     return opCode;
 }   
 
+/* init symbol object */
 Symbol* allocateSymbol(char* token, SymbolType type){
     Symbol* res = (Symbol*)malloc(sizeof(Symbol));
     res->name = token;
@@ -97,6 +107,7 @@ Symbol* allocateSymbol(char* token, SymbolType type){
     return res;
 }
 
+/* return command if it exist in value of symbol */
 Symbol* isCommand(char* token){
     CommandData* res = getCommandData(token);
     if(res){
@@ -106,14 +117,18 @@ Symbol* isCommand(char* token){
     return NULL;
 }
 
+/* returns true if char is in alphabet */
 int isAlpha(char c){
     return ((c <= 'z' && c >= 'a')  || (c <= 'Z' && c >= 'A'));
 }
 
+/* returns true if char is a digit */
 int isNumeric(char c){
     return (c <= '9' && c >= '0');
 }
 
+/* returns label object if label is written in correct format
+if not return null */
 Symbol* isLabel(char* token){
     int i;
     if(token && token[strlen(token) - 1] == ':' && strlen(token) <= MAX_LABEL_SIZE){
@@ -132,12 +147,17 @@ Symbol* isLabel(char* token){
     return NULL;
 }
 
+/* returns symbol if str is in declaration 
+format */
 Symbol* isDeclaration(char* token){
      if(token && token[0] == '.')
         return allocateSymbol(token, DECLARATION);
     return NULL;
 }
 
+
+/* returns symbol if str is in symbol 
+format */
 Symbol* isComment(char* token){
     if(token && token[0] == ';')
         return allocateSymbol(token, COMMENT);
@@ -145,6 +165,7 @@ Symbol* isComment(char* token){
 }
 
 
+/* generates a sybol if it's the char is written correctly */
 Symbol* generateSymbol(char* token){
     int i;
     Symbol* res[4];

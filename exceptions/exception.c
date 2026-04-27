@@ -44,6 +44,7 @@ int readLineSuccess(char** buffer, FILE* file, int lineCouter){
     return isSuccess;
 }
 
+/*return 1 if word used is saved in assembly*/
 int isSavedKeyWord(char* name){
     int i;
      for(i=0;i<sizeof(savedKeywords)/ sizeof(char*);i++){
@@ -54,6 +55,7 @@ int isSavedKeyWord(char* name){
     return 0;
 }
 
+/*return 1 if macro is valid - is not saved key word or is not created twice*/
 int isMacroValid(MacroList* macroLst, char* line, char* macroName, int lineCounter){
     while(macroLst){
         if(strcmp(macroLst->value->name, macroName) == 0){
@@ -69,11 +71,6 @@ int isMacroValid(MacroList* macroLst, char* line, char* macroName, int lineCount
     return 1;
 }
 
-int isSymbolSyntaxException(Symbol* s, int line);
-
-int isCommandParameterException(char* command, int paramsReceived);
-
-int isUsedKeywordException(char* token);
 
 
 

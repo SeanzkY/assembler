@@ -22,7 +22,7 @@ MacroList* generateMacroNode(char* macroName, char* data){
     ret->next = NULL;
     return ret;
 }
-
+/*this deletes and free the space the macro list used*/
 void freeMacroList(MacroList* list){
     MacroList* next = list;
     while(list){
@@ -34,7 +34,7 @@ void freeMacroList(MacroList* list){
     }
 }
 
-
+/*this get macro struct from the list if it exists*/
 Macro* getMacroNodeFromList(MacroList* list, char* macroName){
     while(list){
         if(strcmp(macroName, list->value->name) == 0)
@@ -44,7 +44,7 @@ Macro* getMacroNodeFromList(MacroList* list, char* macroName){
     return NULL;
 }
 
-
+/*this returns 1 if word is only spaces else return 0*/
 int isOnlySpace(char* word){
     while(*word && *word == ' ')
     {
@@ -86,7 +86,9 @@ int addMacroToList(MacroList** macroLst, char* line, char* macroName){
     return 1;
 }
 
-
+/*this it the function that generates the macro file
+it returns 1 if there were no errors in the macro and 0 if 
+there were*/
 int writeMacroFile(char* fileNameWithoutExtension){
     MacroList* macros = NULL;
     MacroList* macrosStart = NULL;
@@ -94,7 +96,7 @@ int writeMacroFile(char* fileNameWithoutExtension){
     char* macroName;
     char* currLine;
     char* currLineStart;
-    int success;
+    int success = 1;
     if(!openFile(fileNameWithoutExtension, ".as")){
         return 0;
     }
@@ -102,7 +104,7 @@ int writeMacroFile(char* fileNameWithoutExtension){
         closeFile();
         return 0;
     }
-    success = readNextLine(&currLine);
+    success = success && readNextLine(&currLine);
     while(currLine){
         currLineStart = currLine;
         currWord = peekFirstWord(currLine);
@@ -122,6 +124,7 @@ int writeMacroFile(char* fileNameWithoutExtension){
             currWord = getFirstWord(&currLine);
             if(currWord && !isOnlySpace(currWord)){
                 printf("error in macro appearance, %s not supposed to appear after macro name, line: %d \n", currWord, getCurrLineCouter());
+                success = 0;
             }
             writeNextLine(getMacroNodeFromList(macrosStart, macroName)->commands);
             free(macroName);
@@ -131,10 +134,10 @@ int writeMacroFile(char* fileNameWithoutExtension){
         }
         free(currWord);
         free(currLineStart);
-        success = readNextLine(&currLine);
+        success = success && readNextLine(&currLine);
     }
     closeFile();
     closeFileWrite();
     freeMacroList(macrosStart);
-    return 1;
+    return success;
 }

@@ -8,12 +8,16 @@
 #define DATA_LITERAL_SEPARATOR ','
 #define FIRST_WORD_SEPARATOR ' '
 
+/* set the pointer to the place where it start after all first
+spaces */
 void skipSpaces(char** wordStart){
     while(**wordStart && **wordStart == ' '){
         (*wordStart)++;
     }
 }
 
+/* set finish point to the string after all spaces
+and no chars */
 void trimEndSpaces(char** wordStart){
     char* start;
     int firstSpacePos;
@@ -31,6 +35,8 @@ void trimEndSpaces(char** wordStart){
     
 }
 
+/* gets two pointers - to start and end
+of string and returns it with new data allocated*/
 char* strCopyWord(char* start, char* end){
     char* result;
     result = malloc((end-start + 2) * sizeof(char));
@@ -39,7 +45,7 @@ char* strCopyWord(char* start, char* end){
     return result;
 }
 
-/*this function is only for string literal - wrapped by STRING_LITERAL_WRAPPER*/
+/* split line - for string literal - for whats after .string  */
 char* getNextWordStrLiteral(char** wordStart){
     char* currStr, *temp;
     skipSpaces(wordStart);
@@ -48,7 +54,6 @@ char* getNextWordStrLiteral(char** wordStart){
         return NULL;
     }
     currStr = *wordStart;
-    /*incase of string value*/
     
     if(*currStr == STRING_LITERAL_WRAPPER){
         currStr++;
@@ -67,8 +72,8 @@ char* getNextWordStrLiteral(char** wordStart){
     return NULL;
 }
 
-/*this function is only for params - .data params and command param - separated by DATA_LITERAL_SEPARATOR
-it will change wordStart to point to the sentence after the word it returned*/
+/* split line - for parameters - parameters for 
+.data or parameters for commands */
 char* getNextWordParams(char** wordStart){
     char* currStr;
     char* res;
@@ -87,7 +92,8 @@ char* getNextWordParams(char** wordStart){
     return res;
 }
 
-/*this function is only for the first word in the line - its always separate the other by FIRST_WORD_SEPARATOR*/
+/* split line - for first word in that
+line */
 char* getFirstWord(char** lineStart){
     char* currStr;
     char* res;
@@ -101,6 +107,8 @@ char* getFirstWord(char** lineStart){
     return res;
 }
 
+/* split line - for first word in that
+line  - without changing original line*/
 char* peekFirstWord(char* lineStart){
     char* cpyLineStart = lineStart;
     return getFirstWord(&cpyLineStart);

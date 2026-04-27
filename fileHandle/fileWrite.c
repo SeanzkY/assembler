@@ -3,19 +3,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "./fileRead.h"
+
 FILE* fileWrite = NULL;
 
 
-char* addExtenstionToNameWrite(char* fileNameWithoutExtension, char* extension){
-    char* fileName = (char*)malloc(strlen((fileNameWithoutExtension) + strlen(extension) + 1) * sizeof(char) );
-    strcpy(fileName,fileNameWithoutExtension);
-    strcat(fileName, extension);
-    return fileName;
-}
 
-
+/*opens file and manage it for writing*/
 int openFileWrite(char* fileNameWithoutExtension, char* extension){
-    char* fileName = addExtenstionToNameWrite(fileNameWithoutExtension, extension);
+    char* fileName = addExtenstionToName(fileNameWithoutExtension, extension);
     fileWrite = fopen(fileName, "w");
     if(!fileWrite){
         printf("error in creating file: %s \n", fileName);
@@ -24,14 +20,14 @@ int openFileWrite(char* fileNameWithoutExtension, char* extension){
     return 1;
 }
 
-
+/*closes file if opened*/
 void closeFileWrite(){
     if(fileWrite)
         fclose(fileWrite);
     fileWrite = NULL;
 }
 
-
+/*wrtie line to file if opened if opened*/
 int writeNextLine(char* buffer){
     if(fileWrite){
         int res;

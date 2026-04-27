@@ -9,7 +9,7 @@
 #include "../tokenization/symbolGenerator.h"
 #include "../CodeGeneration/binaryGenerator.h"
 
-
+/* turn binary command of fixed size to hexa */
 char* binaryCommandToHexa(char* bin, unsigned int sizeBin){
     int maxSizeHexa = sizeBin / 4;
     char* res = (char*)malloc(sizeof(char)  * (maxSizeHexa+1));
@@ -30,7 +30,10 @@ char* binaryCommandToHexa(char* bin, unsigned int sizeBin){
     return res;
 }
 
-
+/* this is the function for second passing
+genFile meaning if need to generate file or not if 
+there was an error or we dont have entire table now
+it writes the entire hexa code to file and the ext file */
 void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
     int i,j;
     char *line, *lineStart, *buffer, *temp, *fileBuffer;
@@ -101,12 +104,14 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
         }
         
     }
+    /*if failure no need to write file*/
     if(genFile)
         openFileWrite(fileName, ".ob");
     fileBuffer = (char*)malloc(31);
     sprintf(fileBuffer, "   %d %d   \n", ic-IC_START, dc);
     writeNextLine(fileBuffer);
     free(fileBuffer);
+    /*write data and code files*/
     for(i=0;i<commandsLst->size;i++){
         fileBuffer = (char*)malloc(4 + MAX_BINARY_SIZE/4 + 1 + 5);
         sprintf(fileBuffer, "%04u %s  %c\n", commandsLst->bin[i]->pos, binaryCommandToHexa(commandsLst->bin[i]->digits, MAX_BINARY_SIZE), commandsLst->bin[i]->info);

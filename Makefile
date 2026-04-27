@@ -16,7 +16,7 @@ preprocess.o: macros/preprocess.c macros/preprocess.h fileHandle/fileRead.c file
 fileRead.o: fileHandle/fileRead.c fileHandle/fileRead.h exceptions/exception.c exceptions/exception.h
 	gcc -Wall -ansi -pedantic -g -c fileHandle/fileRead.c
 
-fileWrite.o: fileHandle/fileWrite.c fileHandle/fileWrite.h
+fileWrite.o: fileHandle/fileWrite.c fileHandle/fileWrite.h fileHandle/fileRead.h
 	gcc -Wall -ansi -pedantic -g -c fileHandle/fileWrite.c
 
 exception.o: exceptions/exception.c exceptions/exception.h
