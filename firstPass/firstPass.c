@@ -47,16 +47,25 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
     Symbol* currSymbol, *labelSymbol;
     LabelData* labelTemp;
     LabelTable* table = initTable();
-    int ic = IC_START, dc = DC_START,  isLabel=0, i;
+    int ic = IC_START, dc = DC_START,  isLabel=0, i, skipped=0;
     openFile(fileName, ".am");
     readNextLine(&line);
     while(line){
+        while(line && line[0] == '\n'){
+            readNextLine(&line);
+            skipped = 1;
+        }
+        if(skipped){
+            skipped = 0;
+            continue;
+        }
+        
         /*printf("curr command is %s", lineStart);*/
         lineStart = line;
         buffer = getFirstWord(&line);
         currSymbol = generateSymbol(buffer);
         if(!currSymbol){
-            printf("command doesnt exist, line: %d command: %s", retLineNum(),lineStart);
+            printf("command doesnt exist, line: %d command: %s\n", retLineNum(),lineStart);
             *isSuccess = 0;
         }
         else if(currSymbol->type == LABEL){
@@ -118,6 +127,7 @@ LabelTable* createLabelTable(char* fileName, int* isSuccess){
                 *isSuccess = 0;
             }
             else{
+                isLabel = 0;
                 buffer = getFirstWord(&line);
                 if(buffer){
                     saveBuffer = getFirstWord(&line);

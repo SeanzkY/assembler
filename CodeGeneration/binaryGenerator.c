@@ -13,6 +13,9 @@
 #define MAX_DIGITS_BINARY 12 
 
 FILE* extFile = NULL;
+int extFileSize = 0;
+char** extFileData = NULL;
+
 
 binaryList* initBinaryList(){
     binaryList* res = (binaryList*)malloc(sizeof(binaryList));
@@ -63,13 +66,13 @@ char* completeToLabel(char* reference){
 binaryList* strLiteralToBinary(char* strLiteral, int* dc){
     binaryList* res = initBinaryList();
     int size, i;
-    char* temp;
-    strLiteral = getNextWordStrLiteral(&strLiteral);
+    char* lineStart = strLiteral, *temp;
+    strLiteral = getNextWordStrLiteral(&lineStart);
     if(!strLiteral){
         return NULL;
     }
-    temp = getFirstWord(&strLiteral);
-    if(temp){
+    temp = getFirstWord(&lineStart);
+    if(temp && strlen(temp) > 0){
         return NULL;
     }
     size =  strlen(strLiteral) - 1;
@@ -78,8 +81,9 @@ binaryList* strLiteralToBinary(char* strLiteral, int* dc){
         return NULL;
     }
     for(i=1;i<size;i++){
-        if((int)strLiteral[i] < 0 || (int)strLiteral[i] > 127)
+        if((int)strLiteral[i] < 0 || (int)strLiteral[i] > 127){
             return NULL;
+        }
     }
     for(i=1;i<size;i++){
         addToBinaryList(res, intToBinary((int)strLiteral[i], A, *dc));
@@ -144,21 +148,35 @@ AddressType getAddressType(char* operand){
 }
 
 
-int writeExtFile(char* label, int pos, char* fileName){
-    int res;
+int writeExtFile(char* label, int pos){
+    
     char* buffer = (char*)malloc(24 + strlen(label) + 10);
-    sprintf(buffer, "%s %04u \n", label, pos);        
+    sprintf(buffer, "%s %04u \n", label, pos);    
+    extFileSize++;
+    extFileData = (char**)realloc(extFileData ,sizeof(char*) * extFileSize);
+    extFileData[extFileSize-1] = buffer;   
+    return 1;
+
+}
+
+int commitExtFile(char* fileName){
+    int res = 1, i;
     if(!extFile){
         char* fullFileName = addExtenstionToNameWrite(fileName, ".ext");
         extFile = fopen(fullFileName, "w");
     }
-    res = fputs(buffer, extFile);
+    for(i=0;i<extFileSize;i++){
+        res = fputs(extFileData[i], extFile) && res;
+    }
+    
     return res;
 }
 
 void closeExtFile(){
     if(extFile){
         fclose(extFile);
+        extFileSize = 0;
+        extFileData = NULL;
         extFile = NULL;
     }
 }
@@ -184,7 +202,7 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
         if(!temp){
             temp = getLabelFromTable(table, operand+1);
             if(temp && temp->attr == EXTERNAL){
-                writeExtFile(temp->name, ic, fileName);
+                writeExtFile(temp->name, ic);
                 info = E;
             }
             else{
@@ -209,7 +227,7 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
         if(!temp){
             temp = getLabelFromTable(table, operand);
             if(temp && temp->attr == EXTERNAL){
-                writeExtFile(temp->name, ic, fileName);
+                writeExtFile(temp->name, ic);
                 info = E;
             }
             else{

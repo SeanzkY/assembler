@@ -41,7 +41,7 @@ char* strCopyWord(char* start, char* end){
 
 /*this function is only for string literal - wrapped by STRING_LITERAL_WRAPPER*/
 char* getNextWordStrLiteral(char** wordStart){
-    char* currStr;
+    char* currStr, *temp;
     skipSpaces(wordStart);
 
     if(!**wordStart){
@@ -56,7 +56,10 @@ char* getNextWordStrLiteral(char** wordStart){
             currStr++;
         }
         if(*currStr == STRING_LITERAL_WRAPPER){
-            return strCopyWord(*wordStart, currStr);
+            temp = strCopyWord(*wordStart, currStr);
+            *wordStart = currStr+1;
+            trimEndSpaces(wordStart);
+            return temp;
         }
         else
             return NULL;

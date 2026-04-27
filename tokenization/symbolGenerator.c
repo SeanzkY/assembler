@@ -27,7 +27,7 @@ CommandData commands[16] = {
     {"jsr", 12 , 9, EMPTY_ADDRS_LST, ADDRESS_TYPE_4 },
     {"red", 0 , 12, EMPTY_ADDRS_LST, ADDRESS_TYPE_3 },
     {"prn", 0 , 13, EMPTY_ADDRS_LST, ADDRESS_TYPE_1 },
-    {"rst", 0 , 14, EMPTY_ADDRS_LST, EMPTY_ADDRS_LST },
+    {"rts", 0 , 14, EMPTY_ADDRS_LST, EMPTY_ADDRS_LST },
     {"stop", 0 , 15, EMPTY_ADDRS_LST, EMPTY_ADDRS_LST }
 };
 

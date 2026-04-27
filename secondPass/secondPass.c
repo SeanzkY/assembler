@@ -45,7 +45,8 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
         buffer = getFirstWord(&line);
         currSymbol = generateSymbol(buffer);
         if(!currSymbol){
-            
+            if(line && line[0] != '\n')
+                genFile = 0;
         }
         else if(currSymbol->type == LABEL){
             isLabel = 1;
@@ -119,8 +120,11 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
         free(fileBuffer);
     }
     closeFileWrite();
-    if(genFile)
+    if(genFile){
+        commitExtFile(fileName);
         openFileWrite(fileName,".ent");
+    }
+        
     for(i=0;i<table->size;i++){
         fileBuffer = (char*)malloc(24 + strlen(table->labels[i]->name) + 10);
         if(table->labels[i]->attr == CODE_AND_ENTRY || table->labels[i]->attr == DATA_AND_ENTRY){
