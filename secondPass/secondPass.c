@@ -34,16 +34,13 @@ char* binaryCommandToHexa(char* bin, unsigned int sizeBin){
 void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
     int i,j;
     char *line, *lineStart, *buffer, *temp, *fileBuffer;
-    binaryList *commandsLst = initBinaryList(), *dataLst = initBinaryList();
+    binaryList *commandsLst = initBinaryList(), *dataLst = initBinaryList(), *tempList;
     Symbol* currSymbol;
     LabelData* labelTemp;
     int ic = IC_START, dc = DC_START,  isLabel=0;
     openFile(fileName, ".am");
-    if(genFile)
-        openFileWrite(fileName, ".ob");
     readNextLine(&line);
     while(line){
-        /*printf("curr command is %s", line);*/
         lineStart = line;
         buffer = getFirstWord(&line);
         currSymbol = generateSymbol(buffer);
@@ -68,6 +65,7 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
                 labelTemp =  getLabelFromTable(table, temp);
                 if(!labelTemp){
                     printf("entry: %s doesn't exist in file, line: %d\n", buffer, getCurrLineCouter());
+                    genFile = 0;
                 }
                 else{
                     if(labelTemp->attr == CODE)
@@ -75,7 +73,8 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
                     else if(labelTemp->attr == DATA)
                         labelTemp->attr = DATA_AND_ENTRY;
                     else{
-                    printf("entry: %s doesn't exist in file in correct way, line: %d\n", buffer, getCurrLineCouter());
+                        printf("entry: %s doesn't exist in file in correct way, line: %d\n", buffer, getCurrLineCouter());
+                        genFile = 0;
                     }
                 }
                 
@@ -84,7 +83,14 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
         }
         else if(currSymbol->type == COMMAND){
             isLabel = 0;
-            addTwoBinaryLists(commandsLst ,commandToBinary(currSymbol->name, line, &ic, table, fileName, 1));
+            tempList = commandToBinary(currSymbol->name, line, &ic, table, fileName, 1);
+            if(!tempList){
+                genFile = 0;
+            }
+            else{
+                addTwoBinaryLists(commandsLst , tempList);
+            }
+
         }
         else if(currSymbol->type == COMMENT){
              isLabel = 0;
@@ -94,7 +100,8 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
         }
         
     }
-
+    if(genFile)
+        openFileWrite(fileName, ".ob");
     fileBuffer = (char*)malloc(31);
     sprintf(fileBuffer, "   %d %d   \n", ic-IC_START, dc);
     writeNextLine(fileBuffer);
@@ -112,7 +119,8 @@ void writeBinaryFile(char* fileName, LabelTable* table, int genFile){
         free(fileBuffer);
     }
     closeFileWrite();
-    openFileWrite(fileName,".ent");
+    if(genFile)
+        openFileWrite(fileName,".ent");
     for(i=0;i<table->size;i++){
         fileBuffer = (char*)malloc(24 + strlen(table->labels[i]->name) + 10);
         if(table->labels[i]->attr == CODE_AND_ENTRY || table->labels[i]->attr == DATA_AND_ENTRY){

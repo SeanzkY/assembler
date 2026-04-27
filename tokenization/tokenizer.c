@@ -103,37 +103,3 @@ char* peekFirstWord(char* lineStart){
     return getFirstWord(&cpyLineStart);
 }
 
-/*this function returns
-
-void splitLine(char** lineStart){
-    Symbol* firstTokenRes = NULL;
-    while(**lineStart && **lineStart != END_SENTENCE){
-        if(firstTokenRes){
-            if(firstTokenRes->type == LABEL){
-                firstTokenRes = generateSymbol(getFirstWord(lineStart));
-            }
-            else if(firstTokenRes->type == COMMAND){
-                while(**lineStart && **lineStart != END_SENTENCE){
-                    getNextWordParams(lineStart);
-                }
-            }
-            else if(firstTokenRes->type == DECLARATION){
-                if(strcmp(firstTokenRes->name, ".string") == 0){
-                    getNextWordStrLiteral(lineStart);
-                }
-                else if(strcmp(firstTokenRes->name, ".data") == 0){
-                    while(**lineStart && **lineStart != END_SENTENCE){
-                        getNextWordParams(lineStart);
-                    }
-                }
-                else{
-                    printf("exception\n");
-                }
-            }
-        }
-        else{
-            firstTokenRes = generateSymbol(getFirstWord(lineStart));
-        }
-    }
-}
-    */

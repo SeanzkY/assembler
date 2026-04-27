@@ -22,9 +22,12 @@ binaryList* initBinaryList(){
 }
 
 void addToBinaryList(binaryList* lst, binaryData* data){
-    lst->bin = (binaryData**)realloc(lst->bin, sizeof(binaryData*) * (lst->size+1));
-    lst->bin[lst->size] = data;
-    lst->size++;
+    if(data){
+        lst->bin = (binaryData**)realloc(lst->bin, sizeof(binaryData*) * (lst->size+1));
+        lst->bin[lst->size] = data;
+        lst->size++;
+    }
+  
 }
 
 void addTwoBinaryLists(binaryList* lst1, binaryList* lst2){
@@ -179,14 +182,14 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
         operandWithAdder = completeToLabel(operand);
         temp = getLabelFromTable(table, operandWithAdder+1);
         if(!temp){
-            
             temp = getLabelFromTable(table, operand+1);
-            if(temp->attr == EXTERNAL){
+            if(temp && temp->attr == EXTERNAL){
                 writeExtFile(temp->name, ic, fileName);
                 info = E;
             }
             else{
-                printf("fallback to external - need to add check");
+                printf("label: %s doesnt exist mentioned in line %d\n", operand, getCurrLineCouter());
+                return NULL;
             }
         }
         if(temp->address - (ic) > (1 << (MAX_BINARY_SIZE-1)) - 1 || temp->address - ic + 1 < -1 *(1 << (MAX_BINARY_SIZE-1))){
@@ -205,16 +208,19 @@ binaryData* translateOperand(char* operand, AddressType num, int ic, LabelTable*
         info = R;
         if(!temp){
             temp = getLabelFromTable(table, operand);
-            if(temp->attr == EXTERNAL){
+            if(temp && temp->attr == EXTERNAL){
                 writeExtFile(temp->name, ic, fileName);
                 info = E;
             }
             else{
-                printf("fallback to external - need to add check");
+                printf("label: %s doesnt exist mentioned in line %d\n", operand, getCurrLineCouter());
+                return NULL;
             }
+
         }
             
         res = (unsigned int)temp->address;
+        
         return intToBinary(res, info, ic);
     }
     return NULL;
@@ -255,8 +261,11 @@ binaryList* commandToBinary(char* command, char* line , int* ic, LabelTable* tab
                     printf("error in command %s  line %d, parameters mismatch command\n", command ,getCurrLineCouter());
                 }
             }
-                
-            addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table, fileName));
+            commandData = translateOperand(buffer,getAddressType(buffer), *ic, table, fileName);
+
+            if(!commandData)
+                return NULL;
+            addToBinaryList(res, commandData);
         }
         
         /*addToBinaryList(res, translateOperand(buffer,getAddressType(buffer), *ic, table));*/
